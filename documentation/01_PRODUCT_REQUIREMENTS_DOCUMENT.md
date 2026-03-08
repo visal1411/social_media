@@ -333,6 +333,141 @@ User Clicks              API Gateway         PostgreSQL          Redux Store
         │  turns red)         │                   │                   │
 ```
 
+    ### 6.3 API Endpoints (MVP)
+
+    This is the full endpoint list your project should have for MVP.
+
+    Base URL example: `https://api.hobbyhub.com/api/v1`
+
+    Auth rule:
+    - Public endpoints: no token needed
+    - Protected endpoints: `Authorization: Bearer <jwt_token>` required
+
+    #### 6.3.1 Auth Endpoints
+
+    | Method | Endpoint | Public/Protected | What it does |
+    |---|---|---|---|
+    | `POST` | `/auth/signup` | Public | Create a new user account |
+    | `POST` | `/auth/login` | Public | Login and return JWT token |
+    | `POST` | `/auth/logout` | Protected | Logout current user |
+    | `POST` | `/auth/refresh` | Protected | Refresh access token |
+    | `GET` | `/auth/me` | Protected | Return current logged-in user info |
+
+    #### 6.3.2 User Profile Endpoints
+
+    | Method | Endpoint | Public/Protected | What it does |
+    |---|---|---|---|
+    | `GET` | `/users/:userId` | Public | Get public profile details |
+    | `PATCH` | `/users/:userId` | Protected | Update own profile (bio, avatar, skills) |
+    | `GET` | `/users/:userId/projects` | Public | Get projects created by this user |
+    | `GET` | `/users/:userId/followers` | Public | List followers |
+    | `GET` | `/users/:userId/following` | Public | List following |
+
+    #### 6.3.3 Project Endpoints
+
+    | Method | Endpoint | Public/Protected | What it does |
+    |---|---|---|---|
+    | `POST` | `/projects` | Protected | Create a new project post |
+    | `GET` | `/projects` | Public | List projects with filters (`tag`, `community`, `type`, `status`) |
+    | `GET` | `/projects/:projectId` | Public | Get single project details |
+    | `PATCH` | `/projects/:projectId` | Protected | Edit own project |
+    | `DELETE` | `/projects/:projectId` | Protected | Delete own project |
+    | `POST` | `/projects/:projectId/publish` | Protected | Move project from draft to published |
+    | `POST` | `/projects/:projectId/archive` | Protected | Archive a project |
+
+    #### 6.3.4 Like Endpoints
+
+    | Method | Endpoint | Public/Protected | What it does |
+    |---|---|---|---|
+    | `POST` | `/projects/:projectId/likes` | Protected | Like a project |
+    | `DELETE` | `/projects/:projectId/likes` | Protected | Remove like from a project |
+    | `GET` | `/projects/:projectId/likes/count` | Public | Get total like count |
+
+    #### 6.3.5 Comment Endpoints
+
+    | Method | Endpoint | Public/Protected | What it does |
+    |---|---|---|---|
+    | `POST` | `/projects/:projectId/comments` | Protected | Add a comment |
+    | `GET` | `/projects/:projectId/comments` | Public | Get comments (with replies) |
+    | `PATCH` | `/comments/:commentId` | Protected | Edit own comment |
+    | `DELETE` | `/comments/:commentId` | Protected | Delete own comment |
+    | `POST` | `/comments/:commentId/replies` | Protected | Reply to a comment |
+
+    #### 6.3.6 Community Endpoints
+
+    | Method | Endpoint | Public/Protected | What it does |
+    |---|---|---|---|
+    | `GET` | `/communities` | Public | List all communities |
+    | `GET` | `/communities/:communityId` | Public | Get community details |
+    | `POST` | `/communities/:communityId/join` | Protected | Join a community |
+    | `DELETE` | `/communities/:communityId/join` | Protected | Leave a community |
+    | `GET` | `/communities/:communityId/projects` | Public | Get projects in a community |
+
+    #### 6.3.7 Follow Endpoints
+
+    | Method | Endpoint | Public/Protected | What it does |
+    |---|---|---|---|
+    | `POST` | `/users/:userId/follow` | Protected | Follow a user |
+    | `DELETE` | `/users/:userId/follow` | Protected | Unfollow a user |
+
+    #### 6.3.8 Challenge Endpoints
+
+    | Method | Endpoint | Public/Protected | What it does |
+    |---|---|---|---|
+    | `GET` | `/challenges/active` | Public | List active challenges |
+    | `GET` | `/challenges/:challengeId` | Public | Get challenge details |
+    | `POST` | `/challenges/:challengeId/entries` | Protected | Submit project to challenge |
+    | `GET` | `/challenges/:challengeId/leaderboard` | Public | Get leaderboard by likes |
+
+    #### 6.3.9 Feed and Search Endpoints
+
+    | Method | Endpoint | Public/Protected | What it does |
+    |---|---|---|---|
+    | `GET` | `/feed/:userId` | Protected | Get personalized home feed |
+    | `GET` | `/search/projects` | Public | Search projects by keyword and tags |
+    | `GET` | `/search/users` | Public | Search users by name and skills |
+    | `GET` | `/search/communities` | Public | Search communities by name |
+
+    #### 6.3.10 Notification Endpoints
+
+    | Method | Endpoint | Public/Protected | What it does |
+    |---|---|---|---|
+    | `GET` | `/notifications` | Protected | Get current user's notifications |
+    | `PATCH` | `/notifications/:notificationId/read` | Protected | Mark one notification as read |
+    | `PATCH` | `/notifications/read-all` | Protected | Mark all notifications as read |
+
+    #### 6.3.11 Admin Endpoints (Optional for MVP, recommended)
+
+    | Method | Endpoint | Public/Protected | What it does |
+    |---|---|---|---|
+    | `POST` | `/admin/challenges` | Protected (Admin) | Create a challenge |
+    | `PATCH` | `/admin/projects/:projectId/feature` | Protected (Admin) | Mark project as featured |
+    | `GET` | `/admin/metrics` | Protected (Admin) | View platform stats |
+
+    #### 6.3.12 Response Code Standard
+
+    Use these status codes consistently:
+
+    | Status Code | Meaning | When to use |
+    |---|---|---|
+    | `200` | OK | Successful `GET`, `PATCH`, `DELETE` |
+    | `201` | Created | Successful `POST` (new resource created) |
+    | `400` | Bad Request | Missing or invalid input |
+    | `401` | Unauthorized | Missing/invalid JWT token |
+    | `403` | Forbidden | Logged in but no permission |
+    | `404` | Not Found | Resource does not exist |
+    | `409` | Conflict | Duplicate action (like already liked/joined) |
+    | `422` | Unprocessable Entity | Validation failed |
+    | `500` | Internal Server Error | Unexpected backend error |
+
+    #### 6.3.13 MVP Endpoint Count
+
+    - Core MVP endpoints: **42**
+    - Optional admin endpoints: **3**
+    - Total documented endpoints: **45**
+
+    This endpoint list matches your PRD features: auth, projects, communities, likes, comments, follow system, challenges, feed, search, and notifications.
+
 ---
 
 ## 7. Entity State Transitions
