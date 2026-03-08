@@ -877,4 +877,459 @@ describe('POST /api/projects', () => {
 
 ---
 
-**End of Database Design Document**
+## 11. Additional SQL Query Examples
+
+### 11.1 Search Projects by Tags (Array Contains)
+
+**Business Logic:** Find all projects with "React" tag
+
+```sql
+SELECT p.project_id, p.title, p.tags, u.username
+FROM projects p
+INNER JOIN users u ON p.user_id = u.user_id
+WHERE p.tags @> ARRAY['React']  -- PostgreSQL array contains operator
+AND p.status = 'published'
+ORDER BY p.created_at DESC
+LIMIT 20;
+```
+
+**Why `@>` operator?**
+- PostgreSQL specific array operator
+- Much faster than `'React' = ANY(tags)`
+- Requires GIN index on tags column
+
+---
+
+### 11.2 Get User Profile with Stats
+
+**Business Logic:** Show complete profile page (followers, following, project count)
+
+```sql
+SELECT 
+  u.user_id,
+  u.username,
+  u.email,
+  u.bio,
+  u.avatar_url,
+  u.plan_type,
+  u.is_verified,
+  u.created_at,
+  -- Followers count
+  (SELECT COUNT(*) FROM follows WHERE followee_id = u.user_id) AS followers_count,
+  -- Following count
+  (SELECT COUNT(*) FROM follows WHERE follower_id = u.user_id) AS following_count,
+  -- Total projects
+  (SELECT COUNT(*) FROM projects WHERE user_id = u.user_id AND status = 'published') AS project_count,
+  -- Total likes received across all projects
+  (SELECT COUNT(*) FROM likes l 
+   INNER JOIN projects p ON l.project_id = p.project_id 
+   WHERE p.user_id = u.user_id) AS total_likes_received,
+  -- Communities joined
+  (SELECT COUNT(*) FROM memberships WHERE user_id = u.user_id) AS community_count
+FROM users u
+WHERE u.user_id = $1;
+```
+
+**Result example:**
+```json
+{
+  "user_id": 1,
+  "username": "alex_chen",
+  "bio": "CS Student building cool stuff",
+  "followers_count": 289,
+  "following_count": 143,
+  "project_count": 12,
+  "total_likes_received": 487,
+  "community_count": 3
+}
+```
+
+---
+
+### 11.3 Weekly Challenge Winners (Top 3)
+
+**Business Logic:** After challenge ends, show top 3 entries
+
+```sql
+SELECT 
+  p.project_id,
+  p.title,
+  u.username,
+  u.avatar_url,
+  COUNT(l.like_id) AS vote_count,
+  RANK() OVER (ORDER BY COUNT(l.like_id) DESC) AS position
+FROM challenge_entries ce
+INNER JOIN projects p ON ce.project_id = p.project_id
+INNER JOIN users u ON p.user_id = u.user_id
+LEFT JOIN likes l ON p.project_id = l.project_id
+WHERE ce.challenge_id = $1
+GROUP BY p.project_id, u.user_id
+ORDER BY vote_count DESC
+LIMIT 3;
+```
+
+**Use case:** Display winners on home page banner after challenge closes
+
+---
+
+### 11.4 Recently Active Users (Complex JOIN)
+
+**Business Logic:** Find users who posted, commented, or liked in last 7 days
+
+```sql
+-- Get recent activity from three sources
+WITH recent_posts AS (
+  SELECT DISTINCT user_id, created_at 
+  FROM projects 
+  WHERE created_at > NOW() - INTERVAL '7 days'
+),
+recent_comments AS (
+  SELECT DISTINCT user_id, created_at 
+  FROM comments 
+  WHERE created_at > NOW() - INTERVAL '7 days'
+),
+recent_likes AS (
+  SELECT DISTINCT user_id, created_at 
+  FROM likes 
+  WHERE created_at > NOW() - INTERVAL '7 days'
+)
+-- Combine all activity
+SELECT 
+  u.user_id,
+  u.username,
+  u.avatar_url,
+  u.plan_type,
+  MAX(COALESCE(rp.created_at, rc.created_at, rl.created_at)) AS last_activity
+FROM users u
+LEFT JOIN recent_posts rp ON u.user_id = rp.user_id
+LEFT JOIN recent_comments rc ON u.user_id = rc.user_id
+LEFT JOIN recent_likes rl ON u.user_id = rl.user_id
+WHERE rp.user_id IS NOT NULL 
+   OR rc.user_id IS NOT NULL 
+   OR rl.user_id IS NOT NULL
+ORDER BY last_activity DESC
+LIMIT 20;
+```
+
+**Why Common Table Expressions (CTEs)?**
+- Breaks complex query into readable parts
+- Easier to debug each section
+- PostgreSQL optimizes well
+
+---
+
+### 11.5 Get Comments with Replies (Threaded)
+
+**Business Logic:** Load comments and replies for a project (nested structure)
+
+```sql
+-- Get all comments for a project
+SELECT 
+  c.comment_id,
+  c.body,
+  c.parent_id,  -- NULL = top-level, else ID of comment it replies to
+  c.created_at,
+  u.user_id,
+  u.username,
+  u.avatar_url,
+  u.is_verified,
+  -- Count replies to this comment
+  (SELECT COUNT(*) FROM comments WHERE parent_id = c.comment_id) AS reply_count
+FROM comments c
+INNER JOIN users u ON c.user_id = u.user_id
+WHERE c.project_id = $1
+AND c.is_deleted = FALSE
+ORDER BY 
+  COALESCE(c.parent_id, c.comment_id),  -- Group replies under parent
+  c.created_at;  -- Oldest first within group
+```
+
+**Frontend handling:**
+```javascript
+// Build nested structure
+const topLevelComments = comments.filter(c => c.parent_id === null);
+const replies = comments.filter(c => c.parent_id !== null);
+topLevelComments.forEach(comment => {
+  comment.replies = replies.filter(r => r.parent_id === comment.comment_id);
+});
+```
+
+---
+
+### 11.6 Transaction Example: Transfer Premium Subscription
+
+**Business Logic:** User upgrades to premium (must be atomic)
+
+```sql
+BEGIN;
+
+-- Step 1: Update user plan
+UPDATE users 
+SET plan_type = 'premium', is_verified = TRUE
+WHERE user_id = $1;
+
+-- Step 2: Log payment record
+INSERT INTO payments (user_id, amount, plan_type, created_at)
+VALUES ($1, 5.00, 'premium', NOW());
+
+-- Step 3: Add premium badge notification
+INSERT INTO notifications_mongo_reference (user_id, type, message)
+VALUES ($1, 'upgrade', 'Welcome to HobbyHub Premium! 🎉');
+
+COMMIT;  -- All or nothing
+```
+
+**Why transactions?**
+- If payment insert fails, user shouldn't get premium
+- If notification fails, still want payment recorded
+- ROLLBACK ensures data consistency
+
+---
+
+### 11.7 Pagination with OFFSET (Not Recommended) vs Cursor
+
+**❌ BAD: OFFSET pagination (slow for large datasets)**
+```sql
+-- Page 1000 means skipping 20,000 rows! (SLOW)
+SELECT * FROM projects
+ORDER BY created_at DESC
+LIMIT 20 OFFSET 20000;
+```
+
+**✅ GOOD: Cursor-based pagination (fast)**
+```sql
+-- First page
+SELECT * FROM projects
+WHERE status = 'published'
+ORDER BY created_at DESC, project_id DESC
+LIMIT 20;
+
+-- Next page (use last item's created_at as cursor)
+SELECT * FROM projects  
+WHERE status = 'published'
+AND (created_at, project_id) < ($last_created_at, $last_project_id)
+ORDER BY created_at DESC, project_id DESC
+LIMIT 20;
+```
+
+**Why cursor is better?**
+- OFFSET scans all skipped rows (slow!)
+- Cursor jumps directly to position (fast!)
+- Works with infinite scroll
+
+---
+
+## 12. Enhanced NoSQL Strategy
+
+### 12.1 MongoDB Schema Design
+
+#### Notifications Collection
+```javascript
+{
+  _id: ObjectId("..."),
+  user_id: 42,  // Indexed
+  type: "new_like",  // Types: new_like, new_comment, new_follower, challenge_result, featured
+  read: false,  // Unread notifications
+  created_at: ISODate("2025-03-08T10:30:00Z"),
+  
+  // Flexible payload per notification type
+  payload: {
+    // For "new_like"
+    actor_id: 15,
+    actor_username: "mia_torres",
+    actor_avatar: "https://cdn.hobbyhub.com/avatars/mia.jpg",
+    project_id: 7,
+    project_title: "StudyBuddy App",
+    
+    // For "new_comment" would have:
+    // comment_text: "Great work!",
+    // comment_id: 123
+    
+    // For "challenge_result" would have:
+    // challenge_title: "Build in 48hrs",
+    // rank: 1,
+    // prize: "Featured spot"
+  }
+}
+```
+
+**MongoDB Indexes:**
+```javascript
+// Fast lookup of user's unread notifications
+db.notifications.createIndex({ user_id: 1, read: 1, created_at: -1 });
+
+// Expire old notifications after 90 days (TTL index)
+db.notifications.createIndex(
+  { created_at: 1 }, 
+  { expireAfterSeconds: 7776000 }  // 90 days
+);
+
+// Type-based queries
+db.notifications.createIndex({ user_id: 1, type: 1 });
+```
+
+**Query examples:**
+```javascript
+// Get unread notifications for user
+db.notifications.find({
+  user_id: 42,
+  read: false
+}).sort({ created_at: -1 }).limit(20);
+
+// Mark all as read
+db.notifications.updateMany(
+  { user_id: 42, read: false },
+  { $set: { read: true } }
+);
+
+// Get notification count per type
+db.notifications.aggregate([
+  { $match: { user_id: 42, read: false } },
+  { $group: { _id: "$type", count: { $sum: 1 } } }
+]);
+```
+
+---
+
+#### Activity Logs Collection (Analytics)
+```javascript
+{
+  _id: ObjectId("..."),
+  event_type: "project_view",  // or: project_like, project_share, profile_visit
+  user_id: 42,  // Who did the action
+  target_id: 7,  // What was acted upon (project_id, user_id, etc)
+  timestamp: ISODate("2025-03-08T14:22:00Z"),
+  metadata: {
+    ip_address: "192.168.1.1",
+    user_agent: "Mozilla/5.0...",
+    referrer: "https://hobbyhub.com/feed",
+    session_id: "abc123"
+  }
+}
+```
+
+**Why MongoDB for logs?**
+- High write throughput (doesn't block main app)
+- Schema-flexible (different events have different metadata)
+- Built-in aggregation for analytics
+
+**Analytics query example:**
+```javascript
+// Top 10 most viewed projects this week
+db.activity_logs.aggregate([
+  { $match: {
+    event_type: "project_view",
+    timestamp: { 
+      $gte: new Date(new Date() - 7*24*60*60*1000) 
+    }
+  }},
+  { $group: {
+    _id: "$target_id",  // Group by project_id
+    views: { $sum: 1 }
+  }},
+  { $sort: { views: -1 } },
+  { $limit: 10 }
+]);
+```
+
+---
+
+### 12.2 Redis Caching Strategy (Expanded)
+
+| Cache Key | Data Stored | TTL | Invalidate When | Example Value |
+|---|---|---|---|---|
+| `feed:user:{id}` | User's personalized feed (20 projects with stats) | 2 min | User joins/leaves community, new project in community | JSON array |
+| `session:{token}` | User session data (id, email, plan) | 7 days | User logs out | JSON object |
+| `community:count:{id}` | Member count | 10 min | User joins/leaves community | Integer |
+| `project:likes:{id}` | Like count for project | 1 min | New like/unlike | Integer |
+| `user:profile:{id}` | User profile with stats | 5 min | Profile updated | JSON object |
+| `challenge:board:{id}` | Leaderboard rankings | 30 sec | New submission or like on entry | JSON array |
+| `tags:popular` | Top 20 trending tags | 1 hour | New project posted | String array |
+| `ratelimit:{user}:{endpoint}` | API request count | 60 sec | Request made | Integer (counter) |
+
+**Redis Data Structures:**
+
+```redis
+# String (simple key-value)
+SET user:profile:42 '{"username":"alex","followers":289}'
+GET user:profile:42
+
+# List (for feeds)
+LPUSH feed:user:42 '{"project_id":101,"title":"..."}'
+LRANGE feed:user:42 0 19  # Get first 20
+
+# Sorted Set (for leaderboards)
+ZADD challenge:board:1 87 "project:101"  # Score: 87 likes
+ZADD challenge:board:1 142 "project:102"
+ZREVRANGE challenge:board:1 0 2 WITHSCORES  # Top 3
+
+# Hash (for complex objects)
+HSET user:stats:42 followers 289 following 143 projects 12
+HGETALL user:stats:42
+
+# Counter (for rate limiting)
+INCR ratelimit:user:42:api/projects
+EXPIRE ratelimit:user:42:api/projects 60
+```
+
+**Cache invalidation patterns:**
+
+```javascript
+// When user posts new project
+await redis.del(`feed:user:${userId}`);
+await redis.del(`user:profile:${userId}`);  // Update project count
+
+// When someone likes a project
+await redis.del(`project:likes:${projectId}`);
+await redis.del(`challenge:board:${challengeId}`);  // If in challenge
+
+// When user joins community
+await redis.del(`feed:user:${userId}`);
+await redis.del(`community:count:${communityId}`);
+```
+
+---
+
+## 13. Database Performance Tuning
+
+### 13.1 Essential Indexes
+
+```sql
+-- User lookups
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_username ON users(username);
+
+-- Project queries
+CREATE INDEX idx_projects_user_id ON projects(user_id);
+CREATE INDEX idx_projects_community_id ON projects(community_id);
+CREATE INDEX idx_projects_status ON projects(status);
+CREATE INDEX idx_projects_created_at ON projects(created_at DESC);
+CREATE INDEX idx_projects_tags ON projects USING GIN(tags);  -- Array index
+
+-- Social features
+CREATE INDEX idx_likes_project_id ON likes(project_id);
+CREATE INDEX idx_likes_user_project ON likes(user_id, project_id);  -- Composite
+CREATE INDEX idx_comments_project_id ON comments(project_id);
+CREATE INDEX idx_follows_follower ON follows(follower_id);
+CREATE INDEX idx_follows_followee ON follows(followee_id);
+
+-- Challenges
+CREATE INDEX idx_challenge_entries_challenge ON challenge_entries(challenge_id);
+CREATE INDEX idx_challenges_ends_at ON challenges(ends_at);
+```
+
+---
+
+### 13.2 Query Optimization Tips
+
+| Problem | Solution | Example |
+|---|---|---|
+| **N+1 queries** | Use JOINs or batch fetching | Don't loop SELECT, use single JOIN |
+| **Missing indexes** | Add index on WHERE/JOIN columns | `CREATE INDEX idx_projects_status` |
+| **SELECT \*** | Only select needed columns | `SELECT id, title` not `SELECT *` |
+| **COUNT(*) slow** | Cache counts or use approximations | Redis counter |
+| **Too many JOINs** | Denormalize or split queries | Store computed values |
+| **Large OFFSET** | Use cursor pagination | `WHERE id < $cursor` |
+
+---
+

@@ -501,7 +501,476 @@ After launch, we track these metrics weekly to measure product-market fit:
 
 ---
 
-## 10. Product Roadmap (Future Phases)
+## 10. UML Diagrams
+
+### 10.1 Use Case Diagram
+
+Shows what users can do in the system:
+
+```
+                    HobbyHub System
+    ┌─────────────────────────────────────────────┐
+    │                                             │
+    │   ○ Browse Projects                         │
+    │   ○ Search Projects/Users                   │
+    │   ○ View Project Details                    │
+    │                                             │
+    │   AUTHENTICATION                            │
+    │   ○ Sign Up                                 │
+    │   ○ Log In                                  │
+    │   ○ Log Out                                 │
+    │                                             │
+    │   PROJECT MANAGEMENT                        │
+    │   ○ Create Project                          │
+    │   ○ Edit Project                            │
+    │   ○ Delete Project                          │
+    │   ○ Upload Image                            │
+    │                                             │
+    │   SOCIAL FEATURES                           │
+    │   ○ Like Project                            │
+    │   ○ Comment on Project                      │
+    │   ○ Reply to Comment                        │
+    │   ○ Follow User                             │
+    │   ○ Unfollow User                           │
+    │                                             │
+    │   COMMUNITY FEATURES                        │
+    │   ○ Browse Communities                      │
+    │   ○ Join Community                          │
+    │   ○ Leave Community                         │
+    │   ○ View Community Feed                     │
+    │                                             │
+    │   CHALLENGES                                │
+    │   ○ View Active Challenges                  │
+    │   ○ Submit Project to Challenge             │
+    │   ○ View Leaderboard                        │
+    │                                             │
+    │   PROFILE                                   │
+    │   ○ Edit Profile                            │
+    │   ○ View Own Projects                       │
+    │   ○ View Followers/Following                │
+    │   ○ Upgrade to Premium      ─────┐         │
+    │                                   │         │
+    └───────────────────────────────────┼─────────┘
+                                        │
+    👤 User (Student/Hobbyist)          │
+        │                               │
+        │ includes                      │
+        ├── Guest User                  │
+        │   (limited access)            │
+        │                               │
+        └── Premium User                │
+            (all features + extras) <───┘
+
+
+    👤 Admin User
+        │
+        ├── Create Challenges
+        ├── Feature Projects
+        ├── Manage Communities
+        └── View Analytics
+```
+
+---
+
+### 10.2 Activity Diagram - Posting a Project
+
+Shows the step-by-step flow when a user posts a project:
+
+```
+    START
+      │
+      ▼
+   ┌──────────────┐
+   │ User clicks  │
+   │ "New Project"│
+   └──────┬───────┘
+          │
+          ▼
+   ┌─────────────────┐
+   │ Check: Logged   │
+   │ in?             │
+   └─────┬───────────┘
+         │
+    ┌────┴────┐
+    │         │
+   NO        YES
+    │         │
+    ▼         ▼
+┌───────┐  ┌─────────────────┐
+│Redirect│  │ Show Create     │
+│to Login│  │ Project Form    │
+└───────┘  └────────┬─────────┘
+    │               │
+    │               ▼
+    │        ┌──────────────┐
+    │        │ User fills:  │
+    │        │ - Title      │
+    │        │ - Description│
+    │        │ - Tags       │
+    │        │ - Image      │
+    │        │ - Community  │
+    │        └──────┬───────┘
+    │               │
+    │               ▼
+    │        ┌──────────────────┐
+    │        │ Click "Submit"   │
+    │        └──────┬───────────┘
+    │               │
+    │               ▼
+    │        ┌──────────────────┐
+    │        │ Validate Form    │
+    │        │ - Title filled?  │
+    │        │ - Description?   │
+    │        └──────┬───────────┘
+    │               │
+    │          ┌────┴────┐
+    │          │         │
+    │        FAIL       PASS
+    │          │         │
+    │          ▼         ▼
+    │    ┌─────────┐  ┌────────────────┐
+    │    │ Show    │  │ Upload image   │
+    │    │ Error   │  │ to server      │
+    │    └────┬────┘  └────────┬───────┘
+    │         │                │
+    │         └────────┐       ▼
+    │                  │  ┌────────────────┐
+    │                  │  │ Save project   │
+    │                  │  │ to database    │
+    │                  │  └────────┬───────┘
+    │                  │           │
+    │                  │           ▼
+    │                  │  ┌────────────────┐
+    │                  │  │ Update cache   │
+    │                  │  │ (feed refresh) │
+    │                  │  └────────┬───────┘
+    │                  │           │
+    │                  │           ▼
+    │                  │  ┌────────────────┐
+    │                  │  │ Show success   │
+    │                  │  │ "Project posted│
+    │                  │  │    ✅"         │
+    │                  │  └────────┬───────┘
+    │                  │           │
+    └──────────────────┴───────────┘
+                       │
+                       ▼
+                     END
+```
+
+---
+
+### 10.3 Activity Diagram - Like/Unlike Flow
+
+```
+    START: User clicks ❤️
+      │
+      ▼
+   ┌──────────────┐
+   │ Check: User  │
+   │ logged in?   │
+   └──────┬───────┘
+          │
+     ┌────┴────┐
+     │         │
+    NO        YES
+     │         │
+     ▼         ▼
+┌────────┐  ┌─────────────────┐
+│Redirect│  │ Query database: │
+│to Login│  │ Already liked?  │
+└────────┘  └────────┬─────────┘
+              ┌──────┴────────┐
+              │               │
+            YES              NO
+              │               │
+              ▼               ▼
+    ┌──────────────┐   ┌──────────────┐
+    │ UNLIKE ACTION│   │ LIKE ACTION  │
+    │              │   │              │
+    │ DELETE FROM  │   │ INSERT INTO  │
+    │ likes table  │   │ likes table  │
+    └──────┬───────┘   └──────┬───────┘
+           │                  │
+           └────────┬─────────┘
+                    │
+                    ▼
+           ┌─────────────────┐
+           │ Update cache    │
+           │ (like count)    │
+           └────────┬────────┘
+                    │
+                    ▼
+           ┌─────────────────┐
+           │ Send response   │
+           │ to frontend     │
+           └────────┬────────┘
+                    │
+                    ▼
+           ┌─────────────────┐
+           │ Update UI:      │
+           │ - Heart icon    │
+           │ - Like count    │
+           └────────┬────────┘
+                    │
+                    ▼
+                   END
+```
+
+---
+
+### 10.4 Sequence Diagram - User Registration Flow
+
+```
+User            Browser         API Server      Database        Email Service
+ │                 │                 │              │                 │
+ │ Fill form       │                 │              │                 │
+ │────────────────>│                 │              │                 │
+ │                 │                 │              │                 │
+ │ Click Submit    │                 │              │                 │
+ │────────────────>│                 │              │                 │
+ │                 │                 │              │                 │
+ │                 │ POST /signup    │              │                 │
+ │                 │ {email,pass}    │              │                 │
+ │                 │────────────────>│              │                 │
+ │                 │                 │              │                 │
+ │                 │                 │ Check email  │                 │
+ │                 │                 │ unique?      │                 │
+ │                 │                 │─────────────>│                 │
+ │                 │                 │              │                 │
+ │                 │                 │<─────────────│                 │
+ │                 │                 │ OK / UNIQUE  │                 │
+ │                 │                 │              │                 │
+ │                 │                 │ Hash password│                 │
+ │                 │                 │ (bcrypt)     │                 │
+ │                 │                 │              │                 │
+ │                 │                 │ INSERT user  │                 │
+ │                 │                 │─────────────>│                 │
+ │                 │                 │              │                 │
+ │                 │                 │<─────────────│                 │
+ │                 │                 │ user_id: 123 │                 │
+ │                 │                 │              │                 │
+ │                 │                 │ Create JWT   │                 │
+ │                 │                 │ token        │                 │
+ │                 │                 │              │                 │
+ │                 │                 │ Send welcome email              │
+ │                 │                 │──────────────────────────────>│
+ │                 │                 │              │                 │
+ │                 │<────────────────│              │                 │
+ │                 │ 201 Created     │              │                 │
+ │                 │ {token, user}   │              │                 │
+ │                 │                 │              │                 │
+ │<────────────────│                 │              │                 │
+ │ Show dashboard  │                 │              │                 │
+ │ (logged in ✅)  │                 │              │                 │
+```
+
+---
+
+### 10.5 Sequence Diagram - Challenge Submission
+
+```
+User         Browser      API Server    Projects DB   Challenges DB   Cache
+ │              │              │              │              │          │
+ │ Browse       │              │              │              │          │
+ │ active       │              │              │              │          │
+ │ challenges   │              │              │              │          │
+ │─────────────>│              │              │              │          │
+ │              │              │              │              │          │
+ │              │ GET /challenges/active      │              │          │
+ │              │─────────────>│              │              │          │
+ │              │              │              │              │          │
+ │              │              │ SELECT * WHERE ends_at > NOW()         │
+ │              │              │──────────────────────────>│            │
+ │              │              │              │              │          │
+ │              │              │<────────────────────────────│          │
+ │              │              │ [Challenge list]            │          │
+ │              │              │              │              │          │
+ │              │<─────────────│              │              │          │
+ │              │ 200 OK       │              │              │          │
+ │<─────────────│ [Challenges] │              │              │          │
+ │              │              │              │              │          │
+ │ Select       │              │              │              │          │
+ │ project      │              │              │              │          │
+ │ & submit     │              │              │              │          │
+ │─────────────>│              │              │              │          │
+ │              │              │              │              │          │
+ │              │ POST /challenges/801/submit │              │          │
+ │              │ {project_id: 101}           │              │          │
+ │              │─────────────>│              │              │          │
+ │              │              │              │              │          │
+ │              │              │ Check: project exists?      │          │
+ │              │              │─────────────>│              │          │
+ │              │              │<─────────────│              │          │
+ │              │              │ YES          │              │          │
+ │              │              │              │              │          │
+ │              │              │ Check: already submitted?   │          │
+ │              │              │──────────────────────────>│            │
+ │              │              │              │              │          │
+ │              │              │<────────────────────────────│          │
+ │              │              │ NO (good!)   │              │          │
+ │              │              │              │              │          │
+ │              │              │ INSERT challenge_entry      │          │
+ │              │              │──────────────────────────>│            │
+ │              │              │              │              │          │
+ │              │              │ Invalidate leaderboard cache│          │
+ │              │              │──────────────────────────────────────>│
+ │              │              │              │              │          │
+ │              │<─────────────│              │              │          │
+ │              │ 201 Created  │              │              │          │
+ │              │ "Submitted!" │              │              │          │
+ │<─────────────│              │              │              │          │
+ │ Show success │              │              │              │          │
+ │ message ✅   │              │              │              │          │
+```
+
+---
+
+### 10.6 Class Diagram (Domain Model)
+
+Shows the main objects and their relationships:
+
+```
+┌─────────────────────────────┐
+│          User               │
+├─────────────────────────────┤
+│ - user_id: int              │
+│ - username: string          │
+│ - email: string             │
+│ - password_hash: string     │
+│ - bio: text                 │
+│ - plan_type: string         │
+│ - is_verified: boolean      │
+├─────────────────────────────┤
+│ + register()                │
+│ + login()                   │
+│ + updateProfile()           │
+│ + follow(user_id)           │
+│ + unfollow(user_id)         │
+└──────────┬──────────────────┘
+           │ 1
+           │ posts
+           │ *
+           ▼
+┌─────────────────────────────┐
+│         Project             │
+├─────────────────────────────┤
+│ - project_id: int           │
+│ - title: string             │
+│ - description: text         │
+│ - tags: array               │
+│ - image_url: string         │
+│ - status: string            │
+│ - created_at: timestamp     │
+├─────────────────────────────┤
+│ + create()                  │
+│ + edit()                    │
+│ + delete()                  │
+│ + publish()                 │
+│ + addToChallenge()          │
+└──────────┬──────────────────┘
+           │ *
+           │ belongs to
+           │ 1
+           ▼
+┌─────────────────────────────┐
+│        Community            │
+├─────────────────────────────┤
+│ - community_id: int         │
+│ - name: string              │
+│ - description: text         │
+│ - icon: string              │
+│ - member_count: int         │
+├─────────────────────────────┤
+│ + create()                  │
+│ + addMember(user_id)        │
+│ + removeMember(user_id)     │
+└─────────────────────────────┘
+
+┌─────────────────────────────┐
+│          Like               │
+├─────────────────────────────┤
+│ - like_id: int              │
+│ - user_id: int              │
+│ - project_id: int           │
+│ - created_at: timestamp     │
+├─────────────────────────────┤
+│ + add()                     │
+│ + remove()                  │
+└─────────────────────────────┘
+
+┌─────────────────────────────┐
+│         Comment             │
+├─────────────────────────────┤
+│ - comment_id: int           │
+│ - body: text                │
+│ - parent_id: int (nullable) │
+│ - created_at: timestamp     │
+├─────────────────────────────┤
+│ + create()                  │
+│ + edit()                    │
+│ + delete()                  │
+│ + reply()                   │
+└─────────────────────────────┘
+
+┌─────────────────────────────┐
+│        Challenge            │
+├─────────────────────────────┤
+│ - challenge_id: int         │
+│ - title: string             │
+│ - starts_at: timestamp      │
+│ - ends_at: timestamp        │
+│ - prize: string             │
+├─────────────────────────────┤
+│ + create()                  │
+│ + submitEntry(project_id)   │
+│ + getLeaderboard()          │
+│ + close()                   │
+└─────────────────────────────┘
+```
+
+---
+
+### 10.7 State Diagram - Project Lifecycle
+
+Shows different states a project can be in:
+
+```
+                 ┌──────────────┐
+          ┌──────│ DRAFT        │◄──────┐
+          │      │ (Initial)    │       │
+          │      └──────┬───────┘       │
+          │             │               │
+          │   [User clicks "Publish"]   │
+          │             │               │
+          │             ▼               │
+          │      ┌──────────────┐       │
+          │      │ PUBLISHED    │       │
+          │      │ (Live)       │       │
+          │      └──────┬───────┘       │
+          │             │               │
+          │       ┌─────┴─────┐         │
+          │       │           │         │
+          │   [Admin          │         │
+          │   features]   [Challenge]   │
+          │       │           │         │
+          ▼       ▼           ▼         │
+    ┌─────────┐ ┌─────────┐ ┌─────────┐│
+    │ ARCHIVED│ │FEATURED │ │COMPETING││
+    │ (Hidden)│ │(Showcase│ │ (Entry) ││
+    └─────────┘ └─────────┘ └─────────┘│
+          │       │           │         │
+          │       └───────┬───┘         │
+          │               │             │
+          │        [Time passes/        │
+          │         Admin action]       │
+          │               │             │
+          └───────────────┴─────────────┘
+```
+
+---
+
+## 11. Product Roadmap (Future Phases)
 
 ### Phase 2 (3 months post-launch)
 - Direct messaging between users
