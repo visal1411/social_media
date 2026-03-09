@@ -1,1127 +1,802 @@
-# HobbyHub — Product Requirements Document
+# HobbyHub — Product Requirements Document (PRD)
 
-**Project:** HobbyHub Social Platform for Hobby & Project Sharing  
-**Classes:** FESE304 (Database Management System) | FESE305 (Software App Dev Studio)  
-**Date:** March 2025  
-**Status:** MVP Ready for Engineering Handoff
+**Product:** HobbyHub — Social Platform for Hobby & Project Sharing
+**Classes:** FESE304 (Database Management System) & FESE305 (Software App Dev Studio)
+**Frontend:** React.js (Web App, not mobile app)
+**Presentation Format:** 30-minute engineering hand-off + 10-minute Q&A
+**Date:** March 2026
+**Status:** MVP Ready for Engineering Hand-off
 
----
-
-## 1. Product Overview
-
-### 1.1 Problem Statement
-
-Most social media platforms focus on viral content and trending posts, making it hard for young adults and college students to share their hobby projects—art, music, games, coding—without getting lost in the noise from big influencers. Additionally, finding potential project collaborators and startup co-founders within your campus community is nearly impossible on generic social platforms.
-
-**Main Problems:**
-- Personal projects get buried in everyone's feeds
-- Hard to find people with the same interests on campus
-- No special space for hobby groups
-- Tough to get helpful feedback on your work
-
-### 1.2 Value Proposition
-
-**HobbyHub** is a dedicated social platform for students and hobbyists to:
-- ✅ Share and showcase hobby projects in a distraction-free environment
-- ✅ Discover collaborators and startup co-founders with matching skills
-- ✅ Get constructive feedback from community members
-- ✅ Grow niche creative communities and build personal credibility
-- ✅ Participate in weekly challenges and showcase opportunities
-
-### 1.3 Target Users
-
-| User Persona | Characteristics | Key Need |
-|---|---|---|
-| **Art Students** | Digital/traditional artists, designers wanting feedback | Showcase work, find design collaborators |
-| **Music Producers** | Beat makers, composers, producers looking for networks | Share beats, find vocalists/remixers |
-| **Game Developers** | Indie devs, game designers, pixel artists | Find team members, showcase games |
-| **Startup Seekers** | CS/Engineering students with ideas | Find co-founders and early team members |
-| **Hobbyists** | Anyone exploring a new skill or hobby | Community, encouragement, feedback |
-
-### 1.4 Business Model
-
-| Plan | Price | Features |
-|---|---|---|
-| **Free** | $0/month | Post projects, join up to 3 communities, like & comment, enter challenges |
-| **Creator (Premium)** | $5/month | Everything in Free + Verified badge, priority search, advanced editing, exclusive challenges, featured spotlight eligibility |
+> **How to read this document:** Every section is written in simple, plain English.
+> When a technical term is used, it is explained right after in everyday words.
+> This document is designed so a developer, professor, and non-technical investor can all understand it equally well.
 
 ---
 
-## 2. Scope & MVP
+## Grading Rubric Map
 
-### 2.1 Jobs-to-be-Done (JTBD)
+This table shows exactly where each graded section lives in this document.
 
-We use JTBD to focus on what users are actually trying to accomplish:
+| Grading Section | Points | Where to Find It |
+|---|---|---|
+| **1. Big Picture & Requirements** | 15 pts (FESE305) | Section 1 (Problem), Section 2 (MVP), Section 3 (Requirements) |
+| **2. User Experience & Flow** | 10 pts (FESE305) | Section 4 (UX, Pages, Colors, User Journeys, Wireframes) |
+| **3. Architecture & Logic** | 15 pts (FESE305) | Section 5 (System, Diagrams) |
+| **4. Data Modeling & DB Design** | 20 pts (FESE304) | See `02_DATABASE_DESIGN_DOCUMENT.md` |
+| **5. DB Implementation & Optimization** | 20 pts (FESE304) | See `02_DATABASE_DESIGN_DOCUMENT.md` |
+| **6. QA & Post-Launch** | 10 pts (FESE305) | Section 6 (Testing, KPIs) |
+| **7. Delivery & Q&A Defense** | 10 pts (Joint) | Section 7 (Presentation Plan & Defense Prep) |
 
-| What I'm doing | What I need | Why it matters | Success Measure |
+---
+
+## SECTION 1 — Big Picture & Requirements *(15 pts — FESE305)*
+
+---
+
+### 1A. Problem & Value *(5 pts)*
+
+#### The Problem We Are Solving
+
+Today, most social media platforms are built for everyone — which means they end up serving no one particularly well. College students and hobbyists who want to share their creative projects (art, code, music, games) find that their posts get buried under celebrity news, viral memes, and influencer content. There is no dedicated, safe space for them to show their work, find teammates, and grow their skills.
+
+Here are **4 specific, real-world problems** our users face every day:
+
+1. **"My project post gets no views."** — A 2nd-year game design student posts their Unity prototype on Instagram. Within 30 minutes, it disappears below 50 other posts in their followers' feeds. Nobody sees it. Nobody gives feedback. They lose motivation.
+
+2. **"I can't find anyone to collaborate with."** — A music producer needs a vocalist for their new album. They post on Reddit. They get zero relevant replies and two spam messages. There is no filter, no profile, no shared context to find the right person quickly.
+
+3. **"Weekly challenges don't exist anywhere for students."** — Creative students have no structured way to push themselves. Hackathons happen once a year; everything else is unstructured. There is nothing that gives a weekly creative nudge with a community rooting for them.
+
+4. **"I want to build a startup but I don't know anyone."** — A Computer Science student with a real app idea has no way to find a co-founder, no way to show their portfolio credibly, and no community that bridges technical and non-technical students.
+
+#### Target Personas
+
+**Persona 1: Alex Chen — The Aspiring Startup Founder**
+- Age: 21 | Major: Computer Science | Year: 3rd Year
+- Tech Literacy: High — builds full-stack apps, uses GitHub daily
+- Top 3 Frustrations:
+  - Cannot find a designer or business partner on campus
+  - LinkedIn feels too formal; Instagram is too casual
+  - Gets no genuine feedback on his technical projects
+- Success Looks Like: Posts his StudyBuddy App, gets 3 connection requests from designers within a week, and finds a co-founder through HobbyHub.
+
+**Persona 2: Mia Torres — The Digital Artist**
+- Age: 20 | Major: Fine Arts | Year: 2nd Year
+- Tech Literacy: Medium — comfortable with Figma and social media, less comfortable with code
+- Top 3 Frustrations:
+  - Her art gets lost in the noise on general social platforms
+  - Hard to find clients or collaborators who appreciate creative work
+  - No structured feedback — comments are usually just emoji reactions
+- Success Looks Like: Shares her Campus Life Illustrations series, gets meaningful written comments, and gets commissioned for a project through a connection she made on HobbyHub.
+
+**Persona 3: Leo Park — The Music Producer**
+- Age: 23 | Major: Music Technology | Year: 4th Year
+- Tech Literacy: Medium — uses DAW software (Ableton), comfortable with streaming platforms
+- Top 3 Frustrations:
+  - No one to collaborate with on campus for music projects
+  - SoundCloud is competitive and not campus-focused
+  - Challenge/competition events are rare and hard to find
+- Success Looks Like: Joins the "Music Lab" community, enters the weekly jingle challenge, and finds a vocalist to collaborate with for his final semester project.
+
+#### Business Justification
+
+**Is this a real business opportunity?**
+
+[ASSUMPTION] The global social media market is valued at over $230 billion in 2024. The niche of creative, project-sharing communities for students and hobbyists is largely unserved by existing giants. Platforms like Behance are portfolio-focused (not social), Reddit is unstructured (no profiles), and LinkedIn is too formal. HobbyHub targets college students ages 18–28, a segment of approximately 220 million college students worldwide.
+
+**Key Differentiator vs. Competitors:**
+
+| Platform | What It Does Well | What It Misses |
+|---|---|---|
+| **Behance** | Portfolio display | No community, no challenges, no real-time social feed |
+| **Reddit** | Community discussion | No user profiles, no project structure, no collaborator discovery |
+| **LinkedIn** | Professional networking | Too formal, no hobby/creative focus, intimidating for students |
+| **HobbyHub** | **All of the above in one place** | — |
+
+**Our unique advantage:** HobbyHub is the only platform that combines project showcasing + community building + weekly challenges + structured collaborator discovery — all specifically designed for students and hobbyists.
+
+#### Risk & Mitigation Table
+
+| Risk | Likelihood | Impact | Mitigation Strategy | Owner |
+|---|---|---|---|---|
+| Low initial user adoption | High | High | Launch with campus ambassador program at 3 universities | Product Team |
+| Content quality drops over time | Medium | High | Weekly challenges keep users creating; community moderation rules | Community Team |
+| Privacy concerns with student data | Medium | High | GDPR-compliant data handling, clear privacy policy | Engineering |
+| Competition from large platforms adds similar features | Medium | Medium | Move fast on niche features; build community loyalty early | PM |
+| Premium plan fails to convert free users | High | Medium | Offer 1-month free trial of Premium on signup | Business |
+
+**Feasibility & Next Steps:** HobbyHub is technically feasible to build with a small team using React.js (front-end), Node.js (back-end), and PostgreSQL (database) — all widely supported and well-documented technologies. The MVP can be built in 8 weeks by a team of 4 developers. The immediate next step is to finalize the database schema (Section 6 in the DB Design Document) and set up the development environment.
+
+---
+
+### 1B. Scope & MVP *(5 pts)*
+
+#### Jobs-To-Be-Done (JTBD)
+
+These are the core real-world tasks our users are trying to complete. We build features to serve these jobs.
+
+1. *"When I finish a creative project, I want to share it with people who actually care about the same hobby, so I can get real feedback and feel recognized."*
+2. *"When I'm starting a startup idea, I want to find teammates with complementary skills, so I don't have to build everything alone."*
+3. *"When I feel creatively stuck, I want a structured challenge to push me, so I stay motivated and keep improving."*
+4. *"When I browse my feed, I want to see projects from communities I care about, so I don't waste time on irrelevant content."*
+5. *"When I discover someone whose work I admire, I want to follow them and stay updated on what they build next, so I can grow my own creative network."*
+
+#### Prioritized User Stories (MoSCoW)
+
+| ID | User Story | Priority | Acceptance Criteria | Linked Requirement |
+|---|---|---|---|---|
+| US-01 | As a student, I want to register and create a profile so I can join the HobbyHub community. | Must-Have | Email + password signup works; profile is created in DB; user is redirected to home feed. | FR-01 |
+| US-02 | As a creator, I want to post a project with a title, description, tags, and an image so others can see my work. | Must-Have | Form accepts text and image; post appears in feed within 5 seconds; error shown if title is missing. | FR-03 |
+| US-03 | As a hobbyist, I want to browse and join communities that match my interests so I can find like-minded people. | Must-Have | Communities list shows name, member count, and description; join button works; user sees community in sidebar. | FR-04 |
+| US-04 | As a user, I want to like a project so I can show appreciation to the creator. | Must-Have | Like button toggles; count updates immediately; duplicate likes are prevented. | FR-05 |
+| US-05 | As a user, I want to comment on a project so I can give useful feedback. | Must-Have | Comment box visible on project detail; comment saves and appears immediately; creator is notified. | FR-06 |
+| US-06 | As a potential collaborator, I want to search for users by skill so I can find the right teammate. | Must-Have | Search bar on Directory page filters users by skill tag in real-time. | FR-07 |
+| US-07 | As a creator, I want to participate in weekly challenges so I stay motivated and gain visibility. | Should-Have | Challenge list shows title, deadline, and participant count; submit project button works. | FR-08 |
+| US-08 | As a user, I want to receive notifications when someone likes or comments on my project so I know people are engaging. | Should-Have | Notification bell shows unread count; notification list shows event, actor name, and time. | FR-10 |
+| US-09 | As a user, I want to follow other creators so I can see their latest projects in my feed. | Should-Have | Follow button toggles on Directory and Profile pages; following list is stored. | FR-11 |
+| US-10 | As a premium user, I want a verified badge on my profile so others know I'm a serious creator. | Could-Have | Badge is displayed next to username on posts, profile, and directory cards. | FR-12 |
+
+#### MVP Boundary Statement
+
+The HobbyHub MVP (Minimum Viable Product — the smallest version of the product that still delivers real value) includes: user registration, profile creation, project posting, community join/leave, likes, comments, user search, and basic notifications. **Beyond this line, features are not included in MVP.** Challenge submission is a "should-have" that will be included in MVP because it is a key engagement driver. Features like direct messaging, portfolio builder, premium billing integration, mobile app, email digests, and AI-powered recommendations are explicitly not in this version. The MVP is designed to prove one thing: that students will create, share, and engage with each other's work in a structured community environment.
+
+#### Out-of-Scope (Not in MVP)
+
+- **Direct Messaging (DMs):** Complex feature; community comments serve the collaboration need for now.
+- **Email Digest / Newsletter:** Needs email infrastructure; deferred to Phase 2.
+- **Mobile App (iOS/Android):** The web app is responsive and works well on phones; a native app is Phase 3.
+- **AI-Powered Recommendations:** Requires training data that we don't have at launch.
+- **Payment / Stripe Integration:** Premium badge will be manually assigned by admin for beta testing.
+- **Portfolio Builder:** Advanced feature for Phase 2 after we understand user content patterns.
+
+**Feasibility & Next Steps:** The MVP feature set can be delivered in 6–8 weeks. The next step is for engineering to set up the React.js project with Vite (already done in this codebase) and the Node.js + Express API server, and for the DB team to run the schema creation scripts from the Database Design Document.
+
+---
+
+### 1C. Functional & Non-Functional Requirements *(5 pts)*
+
+#### Functional Requirements — What the System MUST Do
+
+*(A functional requirement is a specific, testable thing the system must be able to do.)*
+
+| ID | Requirement | Plain-English Description | Linked User Story | How to Test It |
+|---|---|---|---|---|
+| FR-01 | User Registration & Auth | A new user can create an account with email and password. The system stores a hashed (scrambled, unreadable) password. User receives a login token. | US-01 | POST `/auth/signup` → verify user record in DB, token returned in response |
+| FR-02 | User Profile Management | A logged-in user can edit their username, bio, skills list, and avatar. Changes must be saved and visible immediately. | US-01 | PATCH `/users/:id` → verify DB record updated, profile page shows new data |
+| FR-03 | Project Post (CRUD) | A user can Create, Read, Update, and Delete their own project posts. Each post has a title, description, tags, image, and community selection. | US-02 | Test all 4 endpoints: POST, GET, PATCH, DELETE for `/projects` |
+| FR-04 | Community Membership | Users can browse all communities, search by keyword, join with one click, and leave at any time. The system tracks who is in which community. | US-03 | POST `/communities/:id/join` → confirm membership row in DB |
+| FR-05 | Like System | One user can like a project exactly once. Clicking again removes the like. The like count updates immediately on screen. | US-04 | POST `/projects/:id/likes` twice → second attempt returns 409 Conflict |
+| FR-06 | Comment System | Users can add comments to any published project. Comments are shown in order with the author's name and time. | US-05 | POST `/projects/:id/comments` → comment appears in GET response |
+| FR-07 | Search | Users can search for projects, other users, and communities using a keyword. Results are filtered and sorted by relevance. | US-06 | GET `/search/users?q=React` → returns users with "React" in skills |
+| FR-08 | Weekly Challenges | The system shows active challenges with a countdown timer and participant count. Users can submit an existing project as their entry. | US-07 | GET `/challenges/active` → list returned; POST `/challenges/:id/entries` → entry created |
+| FR-09 | Showcase of the Week | An admin can mark one project per week as "featured." Featured projects appear at the top of the home feed. | US-10 | PATCH `/admin/projects/:id/feature` → `is_featured` flag set to `true` in DB |
+| FR-10 | In-App Notifications | The system automatically creates a notification when someone likes, comments on, or follows a user. Users can see and dismiss notifications. | US-08 | Action (like) → notification document created in MongoDB → GET `/notifications` returns it |
+| FR-11 | Follow System | A user can follow another user. Followers see the followed user's new projects in their home feed. | US-09 | POST `/users/:id/follow` → row in `follows` table; feed query returns followed user's projects |
+| FR-12 | Premium Badge Display | Users on the "premium" plan display a verified badge (★★) next to their name everywhere their profile appears. | US-10 | Set `plan_type = 'premium'` in DB → badge visible on profile and post cards |
+
+#### Non-Functional Requirements — How WELL the System Performs
+
+*(A non-functional requirement describes the quality, speed, or safety of the system — not just what it does, but how well it does it.)*
+
+| ID | Requirement | Plain-English Description | Target Metric | How to Test It |
+|---|---|---|---|---|
+| NFR-01 | **Performance** | The home feed must load fast. Nobody wants to wait more than 3 seconds for a page to appear. | API response < 300ms at p95 (95% of users experience this or better) | Load test with k6 simulating 500 concurrent users |
+| NFR-02 | **Scalability** | The system must handle a lot of people using it at the same time — imagine everyone in a university opening the app at once. | Support 10,000 concurrent users without crashing | Stress test; add Redis caching for feed queries |
+| NFR-03 | **Security** | All passwords must be scrambled (hashed using bcrypt) before being saved. User sessions must automatically expire after 7 days. | 0 plain-text passwords in DB; tokens expire in 7 days | Security audit; check DB; test expired token returns 401 |
+| NFR-04 | **Availability** | The app must almost always be online. If it goes down, it should come back up quickly and automatically. | 99.5% uptime (less than 44 hours of downtime per year) | Monitoring with AWS CloudWatch alerts |
+| NFR-05 | **Usability / Accessibility** | The app must work equally well on phones, tablets, and laptops. Text must be large enough to read, and buttons must be easy to tap. | Works on screens 320px to 1920px wide; text contrast ratio ≥ 4.5:1 | Test on 3 real devices; run Lighthouse accessibility audit |
+| NFR-06 | **Compliance / Privacy** | Users must be able to delete their own account and all their data. The system must not share data with third parties without permission. | Account deletion removes all user data within 24 hours | Test DELETE `/users/:id` → verify all related rows removed from all tables |
+
+**Feasibility & Next Steps:** All non-functional requirements are achievable with the chosen technology stack (React.js, Node.js, PostgreSQL, Redis). NFR-01 and NFR-02 are the most critical to test before launch. The next step is to write load tests using the k6 tool targeting the feed endpoint, which is the most accessed API in the system.
+
+---
+
+## SECTION 2 — User Experience & Flow *(10 pts — FESE305)*
+
+---
+
+### 2A. User Journeys & Information Architecture
+
+#### User Journey 1: Alex (Startup Founder) — Posts His First Project
+
+**Trigger:** Alex finishes his "StudyBuddy App" prototype and wants feedback.
+
+| Step | What Alex Does | What the App Does | Emotional Tone |
 |---|---|---|---|
-| **Start a new hobby project** | Share it and get real feedback | Improve and stay motivated | Comments within 24hrs |
-| **Need a collaborator** | Discover students with matching skills | Build something together quickly | Connection made within 48hrs |
-| **Feel creatively stuck** | See weekly challenges & prompts | Push my creativity forward | Challenge submitted successfully |
-| **Want recognition** | Be featured on Showcase of the Week | Grow my following and credibility | Profile followers increase > 10% |
+| 1 | Opens HobbyHub and logs in | App verifies token and loads his personalized home feed | 😐 Neutral — just getting started |
+| 2 | Clicks "New Project" button | A form modal (pop-up window) appears with fields for title, description, tags, and image | 😊 Hopeful — excited to share |
+| 3 | Fills in the form and selects "Code & Create" community | Real-time validation checks that title and description are not empty | 😊 Focused — in the zone |
+| 4 | Clicks "Submit" | App sends the data to the server. A loading spinner appears briefly. | 😐 Slightly anxious — waiting |
+| 5 | Feed refreshes, his project card appears at the top | Success toast notification: "Project posted! 🎉" | 😍 Excited — it worked! |
+| 6 | Within 24 hours, a notification appears: "Mia Torres liked your project" | He clicks the notification; it opens the project detail page with Mia's comment | 😍 Grateful — feeling validated |
 
-### 2.2 User Stories & Acceptance Criteria
+**End State:** Alex's project is live, he has 3 comments and 7 likes within 24 hours.
 
-#### **US-01: Share a Project**
-**As a** student with a coding project  
-**I want to** share it with the HobbyHub community  
-**So that** I can get feedback and find collaborators  
+---
 
-**Acceptance Criteria:**
-- ✅ User can create a post with title (max 200 chars), description (max 2000 chars), up to 5 tags, and one image
-- ✅ Post appears in the community feed within 5 seconds of submission
-- ✅ Other users can like and comment on the project
-- ✅ You get a notification when someone likes or comments on your project
-- ✅ App shows a clear error message if title or description is missing
+#### User Journey 2: Mia (Artist) — Joins a Community and Discovers Projects
 
-#### **US-02: Join Communities**
-**As a** hobbyist interested in digital art  
-**I want to** join communities that match my interests  
-**So that** I can discover like-minded people and see relevant content  
+**Trigger:** Mia opens HobbyHub for the first time after signing up.
 
-**Acceptance Criteria:**
-- ✅ User can browse all communities sorted by member count
-- ✅ User can search communities by keyword
-- ✅ User can join a community with one click
-- ✅ Community appears in sidebar after joining
-- ✅ User can leave a community at any time
-- ✅ Free users limited to 3 memberships; premium users unlimited
-
-#### **US-03: Participate in Challenges**
-**As a** creator wanting visibility  
-**I want to** participate in weekly challenges  
-**So that** I stay motivated and grow my visibility  
-
-**Acceptance Criteria:**
-- ✅ Active challenges displayed on home dashboard with countdown
-- ✅ User can submit an existing project as challenge entry with one click
-- ✅ Leaderboard shows entries ranked by likes in real-time
-- ✅ System prevents duplicate submissions for same challenge
-- ✅ After deadline, top 3 entries featured in community announcements
-
-#### **US-04: Find Collaborators**
-**As a** student starting a startup  
-**I want to** find other students with complementary skills  
-**So that** I can recruit co-founders and team members  
-
-**Acceptance Criteria:**
-- ✅ User can search by name, skill, major
-- ✅ Profile shows follower count, shared communities, past projects
-- ✅ User can send connection request with one click
-- ✅ Can view other user's projects
-- ✅ User can follow/unfollow other creators
-
-#### **US-05: Receive Feedback**
-**As a** project creator  
-**I want to** read comments and feedback on my work  
-**So that** I can improve and iterate  
-
-**Acceptance Criteria:**
-- ✅ Comments appear on project page in real-time
-- ✅ User can reply to comments (threaded)
-- ✅ Comments are persistent across sessions
-- ✅ User can delete own comments
-- ✅ Creator receives notification of new comments
-
-### 2.3 MVP Feature Set
-
-Prioritized by business value and technical feasibility:
-
-| # | Feature | Why It Matters | Priority |
+| Step | What Mia Does | What the App Does | Emotional Tone |
 |---|---|---|---|
-| 1 | User registration & authentication | Identity foundation for all features | **MUST HAVE** |
-| 2 | Browse & post projects | Core value delivery | **MUST HAVE** |
-| 3 | Communities (join/leave) | Social graph & discovery | **MUST HAVE** |
-| 4 | Like & comment system | Engagement feedback loop | **MUST HAVE** |
-| 5 | Search & filter projects | Content discoverability | **MUST HAVE** |
-| 6 | User profiles & follow system | Collaborator discovery | **MUST HAVE** |
-| 7 | Weekly challenges | Recurring engagement driver | **SHOULD HAVE** |
-| 8 | Showcase of the Week | Recognition & aspiration | **SHOULD HAVE** |
-| 9 | Notifications | Engagement loop completeness | **SHOULD HAVE** |
-| 10 | Premium badge display | Revenue generation signal | **COULD HAVE** |
+| 1 | Lands on the Communities page from the sidebar | Sees a grid of communities with cover images and logos | 😐 Curious — exploring |
+| 2 | Searches "Art" in the search bar | Results filter in real-time: "Art Studio" appears as the top match | 😊 Interested — found it |
+| 3 | Clicks on "Art Studio" community | A community detail page opens with a cover banner, member count, and all community posts | 😊 Engaged — feels right |
+| 4 | Clicks "Join Community" | Button changes to "Joined ✅"; community appears in sidebar. Toast: "You joined Art Studio!" | 😍 Belonging — feels welcomed |
+| 5 | Scrolls through the feed, finds a project she loves | She clicks the ❤️ like button | 😊 Appreciative — giving back |
+| 6 | Leaves a comment with feedback | Comment appears instantly below the project | 😊 Confident — contributing |
+
+**End State:** Mia is now a member of "Art Studio," has liked 3 projects, and left her first comment.
 
 ---
 
-## 3. Functional & Non-Functional Requirements
+#### User Journey 3: Leo (Music Producer) — Enters a Weekly Challenge
 
-### 3.1 Functional Requirements (What the system MUST do)
+**Trigger:** Leo sees a notification: "New challenge is live in Music Lab."
 
-| ID | Feature Area | Requirement | How We Test It |
+| Step | What Leo Does | What the App Does | Emotional Tone |
 |---|---|---|---|
-| **FR-01** | User Login | Users register with email + password, log in with secure tokens | Test login returns valid token |
-| **FR-02** | User Profile | Users edit username, bio, skills, avatar | Check profile updates save correctly |
-| **FR-03** | Project Post | Users create, edit, delete project posts | Test create/read/update/delete endpoints |
-| **FR-04** | Community | Users browse, search, join, leave communities | Membership table updates |
-| **FR-05** | Likes | One like per user per project (prevent duplicates) | UNIQUE constraint enforcement |
-| **FR-06** | Comments | Users add, edit, delete comments with threading | Comment CRUD tests |
-| **FR-07** | Search | Search projects, users, communities by keyword or tag | Search returns relevant results |
-| **FR-08** | Challenge | View active challenges, submit project entry | Challenge entry created in DB |
-| **FR-09** | Showcase | Admin marks project as "Showcase of the Week" | Featured flag set in DB |
-| **FR-10** | Notifications | Receive in-app alerts for likes, comments, follows | Notification record created |
-| **FR-11** | Follow | Follow/unfollow other users | Follows table record verified |
-| **FR-12** | Premium Badge | Premium users display verified badge, see extended limits | Plan_type checked on badge display |
+| 1 | Clicks the notification | App navigates to the Challenges page, scrolling to the active "Compose a 60-sec Jingle" challenge | 😐 Curious — wondering what it is |
+| 2 | Reads the challenge description and deadline | Challenge card shows prize: "Studio Session Credit," 29 participants, 7 days left | 😊 Motivated — likes the challenge |
+| 3 | Clicks "Enter Challenge" | A modal appears asking him to select an existing project or post a new one | 😐 Thinking — which project? |
+| 4 | Selects his "LoFi Beat Pack Vol.2" project | Entry is confirmed. Toast: "Challenge entered! Good luck! 🎶" | 😍 Excited — ready to compete |
+| 5 | Checks the leaderboard every day | Leaderboard shows his entry ranked by likes in real-time | 😊 Competitive — motivated to keep going |
 
-### 3.2 Non-Functional Requirements (How WELL the system performs)
+**End State:** Leo's entry is submitted. He is ranked #1 after 4 days with 203 likes.
 
-| Category | Requirement | Target | How We Measure |
+---
+
+#### Information Architecture Map
+
+This shows the full navigation structure of the HobbyHub app — how every page connects to every other page.
+
+```
+HobbyHub App
+├── 🔐 Login / Registration Page
+│   ├── Email + Password Login Form
+│   ├── Sign Up Form
+│   └── [Redirects to Home after success]
+│
+├── 🏠 Home Page (Main Feed)
+│   ├── Active Challenge Banner (with countdown)
+│   ├── Project Feed Cards (from joined communities)
+│   │   ├── Like Button → toggles like
+│   │   └── Comment Button → opens Comment Modal
+│   └── Featured "Showcase of the Week" Project
+│
+├── 🌐 Communities Page
+│   ├── Search Bar (filter by keyword)
+│   ├── Community Grid (with cover image and logo)
+│   │   ├── Join / Leave Button
+│   │   └── Click → Community Detail Page
+│   └── Community Detail Page
+│       ├── Cover Banner + Community Logo
+│       ├── Member Count & Description
+│       ├── Community Feed (projects in this community)
+│       └── "Post to this Community" Button → New Project Modal
+│
+├── 📂 Projects Page
+│   ├── Filter Buttons (by type: Showcase / Startup)
+│   ├── "New Project" Button → New Project Form Modal
+│   └── Project Cards (all published projects)
+│       ├── Like Button
+│       └── Comment Button → Comment Modal
+│
+├── ⚡ Challenges Page
+│   ├── Active Challenge Cards (title, prize, participants, deadline)
+│   └── "Enter Challenge" Button → selects project to submit
+│
+├── 🤝 Directory Page (Find People)
+│   ├── Search Bar (filter by name or skill)
+│   └── User Cards
+│       ├── "Connect" Button → toggles connection
+│       └── "Follow" Button → toggles follow
+│
+├── 🔔 Notifications Page
+│   ├── "Mark All Read" Button
+│   └── Notification List (like, comment, follow, challenge, showcase)
+│
+└── 👤 Profile Page
+    ├── Cover Banner + Avatar
+    ├── Bio, Skills, and Stats (followers/following)
+    ├── User's Own Projects Grid
+    ├── "Edit Profile" (future feature)
+    └── "Sign Out" Button
+```
+
+#### Navigation Principles
+
+1. **Max 2 clicks to any feature.** From the Home page, no important action requires more than 2 clicks to reach.
+2. **Mobile-first bottom nav.** On small screens (< 768px), the 3 most important pages (Home, Communities, Projects) are always visible. Other pages are one tap away in the "More" pop-up menu.
+3. **Contextual actions stay in context.** The "Like" and "Comment" buttons are always on the project card — the user does not have to navigate to a separate page to engage.
+4. **Sidebar stays fixed on desktop.** All 7 nav links are always visible on desktop so the user never feels lost.
+5. **Confirmation toasts on every action.** Every action (liking, joining, posting) gives immediate visual feedback so the user knows it worked.
+
+---
+
+### 2B. Page Descriptions & Wireframes
+
+#### Screen 1: Login / Registration Page
+
+- **Purpose:** Let users sign in or create a new account.
+- **Layout:** Centered dark card on the `#09090b` background. HobbyHub logo at the top. Email field, password field, and a "Sign In" button. A "Create Account" toggle below.
+- **Key Interactions:** Clicking "Sign In" sends credentials to `/auth/login`. On success, user is redirected to Home. On failure, a red error message appears inline.
+- **Responsive:** Full-width on mobile; centered max-width 400px card on desktop.
+- **Accessibility:** All input fields have visible labels; error messages use red color AND an icon (not color alone).
+
+#### Screen 2: Home Page (The Main Feed)
+
+- **Purpose:** Show the user what's happening — new projects from communities they joined, active challenges, and featured content.
+- **Layout:**
+  - Top: A highlighted "Active Challenge" banner in a distinct card.
+  - Middle: A horizontal row of 3 project cards (title, image placeholder, tags, like/comment count).
+  - Bottom: A "Load More" button.
+- **Key Interactions:** Like button updates count in real-time. Comment button opens a bottom slide-in modal. Challenge banner has a "Join Now" or "Joined ✅" button.
+- **Responsive:** 3 columns on desktop, 1 column on mobile (cards stack vertically).
+- **Color used:** Card background `#18181b`; borders `#27272a`; text `#fafafa`; muted details `#71717a`.
+
+#### Screen 3: Communities Page
+
+- **Purpose:** Help users discover and join hobby groups.
+- **Layout:**
+  - A search bar at the top.
+  - A grid of community cards, each with a cover image (full-width photo banner), a circular community logo avatar below it, the community name, member count, and a Join/Leave button.
+- **Key Interactions:** Clicking the card opens the Community Detail Page. Clicking "Join" toggles membership with a toast notification.
+- **Responsive:** 2 columns on desktop, 1 column on mobile.
+
+#### Screen 4: Projects Page
+
+- **Purpose:** Browse all projects on the platform, regardless of community.
+- **Layout:**
+  - Filter pills at the top: "All", "Startup", "Showcase".
+  - A "+ New Project" button in the top right.
+  - A grid of project cards (colored image placeholder, title, author, tags, like count, comment count).
+- **Key Interactions:** Filter pills re-render the list live. "+ New Project" opens a form modal. Project card is clickable to see full details with comments.
+
+#### Screen 5: Challenges Page
+
+- **Purpose:** Show ongoing creative competitions.
+- **Layout:** Challenge cards with a colored banner, title, prize description, participant count, and a countdown ("3 days left"). An "Enter Challenge" button on each card.
+- **Key Interactions:** "Enter Challenge" opens a modal that lets the user pick one of their existing projects to submit.
+
+#### Screen 6: Directory Page (Find People)
+
+- **Purpose:** Help users find collaborators and teammates.
+- **Layout:**
+  - Search bar (searches by name or skill).
+  - User cards showing: avatar (initials-based with a color), name, major, year, skills tags, follower count, "Connect" button, "Follow" button.
+  - Premium users have a "★★" badge.
+- **Responsive:** 2 columns on desktop, 1 column on mobile.
+
+#### Screen 7: Profile Page
+
+- **Purpose:** A user's personal hub — their identity on the platform.
+- **Layout:**
+  - A full-width cover banner (colored gradient based on user's hue).
+  - An avatar circle overlapping the bottom of the cover.
+  - Name, major, year, bio text, skills tags.
+  - Stats row: Followers / Following / Projects count.
+  - A grid of the user's own projects below.
+  - A "Sign Out" button at the bottom of the sidebar.
+
+> 🔗 **Prototype Link:** [PLACEHOLDER — https://figma.com/your-hobbyhub-prototype]
+
+**Feasibility & Next Steps:** All screens described above are already implemented in the React.js codebase as separate page components (e.g., `HomePage.jsx`, `CommunitiesPage.jsx`). The next step for the UX team is to build a Figma prototype that mirrors these screens and test it with 5 real students.
+
+---
+
+## SECTION 3 — Architecture & Logic *(15 pts — FESE305)*
+
+---
+
+### 3A. System Overview
+
+#### Technology Stack
+
+| Layer | Technology | Why We Chose It (Plain English) |
+|---|---|---|
+| **Frontend** | React.js 18 + Vite | React.js lets us build interactive UIs efficiently. Vite makes development much faster by serving files instantly during development. |
+| **Styling** | Inline CSS with a design token system (theme.js) | A central `theme.js` file stores all colors. This means changing one color value updates it everywhere in the app. |
+| **API Server** | Node.js + Express.js | Node.js is fast and widely used. Express makes it easy to define routes like `GET /projects` and `POST /auth/login`. |
+| **Authentication** | JWT Tokens (JSON Web Tokens) | JWTs let the server verify who the user is without checking the database on every single request. They expire automatically after 7 days. |
+| **Primary Database** | PostgreSQL | PostgreSQL is a reliable, powerful relational database (stores data in tables with rows and columns). It's great for structured data like users, posts, and likes. |
+| **Document Store** | MongoDB | MongoDB stores data as flexible "documents" (like JSON objects). It's perfect for notifications, which have different shapes depending on the notification type. |
+| **Cache** | Redis | Redis stores frequently-needed data in memory (RAM), which is much faster than reading from the main database. We use it for the home feed. |
+| **Cloud Infrastructure** | AWS (EC2 + RDS + S3 + ElastiCache) | AWS is the industry standard for hosting. EC2 runs our Node.js server, RDS runs our PostgreSQL database, S3 stores images, and ElastiCache runs Redis. |
+
+#### System Architecture Diagram
+
+```mermaid
+graph TD
+    A["👤 User Browser (React.js App)"] -->|"HTTPS Requests"| B["API Gateway (Node.js + Express)"]
+    B --> C["Auth Service (JWT Validation)"]
+    B --> D["Projects Service"]
+    B --> E["Communities Service"]
+    B --> F["Notifications Service"]
+    D --> G["PostgreSQL (Structured Data)"]
+    E --> G
+    F --> H["MongoDB (Documents)"]
+    G --> I["Redis Cache Layer"]
+    I -->|"Cache Hit"| A
+    G --> J["AWS RDS"]
+    H --> K["AWS S3 (Image Storage)"]
+```
+
+**In plain English:** The user's browser (React.js app) sends requests over the internet to our API server. The server checks the user's identity (Auth), then calls the right service depending on what the user wants (projects, communities, notifications). Structured data goes to PostgreSQL; notification data goes to MongoDB. Redis sits in the middle, storing recently-fetched feed data so we don't have to query the database every single time.
+
+---
+
+### 3B. Sequence Diagrams
+
+#### Sequence Diagram 1: User Login Flow
+
+```mermaid
+sequenceDiagram
+    participant U as 👤 User
+    participant App as React.js App
+    participant API as API Server (Node.js)
+    participant DB as PostgreSQL
+
+    U->>App: Types email & password, clicks "Sign In"
+    App->>API: POST /auth/login {email, password}
+    API->>DB: SELECT user WHERE email = 'alex@hub.com'
+    DB-->>API: Returns user row (with password_hash)
+    API->>API: bcrypt.compare(password, hash) — checks if password matches
+    API-->>App: 200 OK + JWT Token
+    App->>App: Saves token to localStorage
+    App->>API: GET /feed/:userId (with token in header)
+    API->>DB: JOIN projects, communities, likes WHERE user is member
+    DB-->>API: Returns list of projects for the feed
+    API-->>App: 200 OK + feed data (JSON)
+    App-->>U: Home Feed is displayed 🏠
+```
+
+#### Sequence Diagram 2: Posting a Project
+
+```mermaid
+sequenceDiagram
+    participant U as 👤 User
+    participant App as React.js App
+    participant API as API Server
+    participant PG as PostgreSQL
+    participant Redis as Redis Cache
+
+    U->>App: Fills in project form (title, description, tags, image)
+    App->>App: Validates form — title and description must not be empty
+    App->>API: POST /projects {title, desc, tags, community_id} + JWT
+    API->>API: Verify JWT token — who is this user?
+    API->>PG: INSERT INTO projects (...) VALUES (...)
+    PG-->>API: Returns new project_id = 42
+    API->>Redis: DEL feed:user:{user_id} — clear the old cached feed
+    Redis-->>API: Cache cleared ✅
+    API-->>App: 201 Created + {project_id: 42, title: "StudyBuddy App"}
+    App->>App: Adds new project to the top of the feed (no page reload needed)
+    App-->>U: Shows success toast "Project posted! 🎉"
+```
+
+---
+
+### 3C. State Transition Diagrams
+
+#### State Diagram: Project Lifecycle
+
+A "project" in HobbyHub is not just one static thing. It moves through different states depending on what the user or admin does with it.
+
+```mermaid
+stateDiagram-v2
+    [*] --> DRAFT : User clicks "New Project" and saves
+
+    DRAFT --> PUBLISHED : User clicks "Publish"
+    DRAFT --> [*] : User deletes the draft
+
+    PUBLISHED --> FEATURED : Admin marks it as "Showcase of the Week"
+    PUBLISHED --> COMPETING : User submits it to a weekly challenge
+    PUBLISHED --> ARCHIVED : User or admin archives it
+
+    FEATURED --> PUBLISHED : Showcase week ends
+    COMPETING --> PUBLISHED : Challenge ends, project returns to normal
+    ARCHIVED --> PUBLISHED : User restores the archived project
+    ARCHIVED --> [*] : User permanently deletes it
+```
+
+**State Transitions Explained:**
+- **DRAFT → PUBLISHED:** The user clicks "Publish" on their project. It is now visible on the community feed.
+- **PUBLISHED → FEATURED:** An admin selects it as the best project of the week. It gets a "Showcase" banner and appears at the top of the home feed.
+- **PUBLISHED → COMPETING:** A user submits it to an active challenge. It now appears in the challenge leaderboard.
+- **PUBLISHED → ARCHIVED:** The user wants to hide the project without deleting it. It disappears from the feed but can be restored.
+- **FEATURED / COMPETING → PUBLISHED:** When the special period ends (showcase week, challenge deadline), the project goes back to its normal published state.
+
+#### State Diagram: Community Membership
+
+```mermaid
+stateDiagram-v2
+    [*] --> NOT_MEMBER : User visits Communities page
+
+    NOT_MEMBER --> MEMBER : User clicks "Join" button
+    MEMBER --> NOT_MEMBER : User clicks "Leave" button
+
+    MEMBER --> MEMBER : User posts a project, likes, or comments (remains a member)
+```
+
+**Plain English:** A user starts as "not a member" of any community. They can join (becoming a "member") or leave at any time. Free users can join a maximum of 3 communities; premium users have unlimited memberships.
+
+**Feasibility & Next Steps:** The state diagrams above directly map to the `status` column in the `projects` table and the presence/absence of rows in the `memberships` table. The next engineering step is to write test cases that verify each state transition is correctly handled by the API server.
+
+---
+
+## SECTION 4 — QA & Post-Launch *(10 pts — FESE305)*
+
+---
+
+### 4A. Testing Strategy
+
+*(QA = Quality Assurance. It means making sure the app works correctly before real users use it.)*
+
+| Testing Type | What It Checks (Plain English) | Tools Used | Who Runs It | Pass Criteria |
+|---|---|---|---|---|
+| **Unit Testing** | Tests one small function at a time. For example: "Does the like-toggle function correctly add 1 to the count?" | Jest (JavaScript testing library) | Developers | 80%+ of functions are covered by tests |
+| **Integration Testing** | Tests that different parts work together. For example: "When the React app calls the API, does the API correctly talk to the database?" | Postman (API tester), Supertest | Developers + QA | All 42 MVP API endpoints return the correct status codes |
+| **End-to-End (E2E)** | Simulates a real user doing a full task — from logging in, to posting a project, to receiving a like notification — all automatically. | Playwright or Cypress (web testing) | QA Team | All 5 critical user journeys complete without errors |
+| **Load Testing** | Tests how the app behaves when many people use it at the same time. Like simulating 1,000 users all loading the home feed simultaneously. | k6 (load testing tool) | DevOps / Backend | 95% of requests respond in under 300ms with 1,000 concurrent users |
+| **User Acceptance Testing (UAT)** | Real students use the app and tell us what's confusing or broken before we launch. | Manual, Google Forms for feedback | 10–15 Beta Students | 85% of users complete the "Post a Project" journey without needing help |
+
+---
+
+### 4B. KPIs & Feedback Loop
+
+*(KPI = Key Performance Indicator. It's a number we track to know if our product is succeeding.)*
+
+**KPI 1 — Daily Active Users / Monthly Active Users (DAU/MAU Ratio)**
+$$\text{DAU/MAU Ratio} = \frac{\text{Users who open the app today}}{\text{Users who opened the app this month}} \times 100$$
+- **Target:** ≥ 25% (industry average is about 20%; we aim for slightly above average)
+- **Measured via:** Server-side session logs
+- **Review Frequency:** Weekly
+
+**KPI 2 — Project Post Rate**
+$$\text{Post Rate} = \frac{\text{Total Projects Posted This Week}}{\text{Total Active Users This Week}} \times 100$$
+- **Target:** ≥ 30% of active users post at least once per month
+- **Measured via:** `projects` table — count of new rows per week
+- **Review Frequency:** Weekly
+
+**KPI 3 — Engagement Rate**
+$$\text{Engagement Rate} = \frac{\text{Total Likes + Comments This Week}}{\text{Total Active Users This Week}} \times 100$$
+- **Target:** ≥ 50% (meaning every active user leaves at least one like or comment per session on average)
+- **Measured via:** `likes` and `comments` table row counts
+- **Review Frequency:** Weekly
+
+**KPI 4 — Community Join Rate**
+$$\text{Join Rate} = \frac{\text{Users Who Joined at Least 1 Community}}{\text{Total Registered Users}} \times 100$$
+- **Target:** ≥ 60% within the first week of sign-up
+- **Measured via:** `memberships` table
+- **Review Frequency:** Monthly
+
+**KPI 5 — Challenge Participation Rate**
+$$\text{Challenge Rate} = \frac{\text{Challenge Entries Submitted}}{\text{Active Users in Challenge Community}} \times 100$$
+- **Target:** ≥ 20% of community members participate in each weekly challenge
+- **Measured via:** `challenge_entries` table
+- **Review Frequency:** Per-challenge (weekly)
+
+**KPI 6 — API Response Latency (p95)**
+$$\text{Feed Load Time}_{p95} < 300ms$$
+- **Target:** 95% of users see their feed loaded in under 300 milliseconds
+- **Measured via:** API server response time logs + Redis cache hit rate
+- **Review Frequency:** Continuously (alerts fire if it exceeds 500ms)
+
+**KPI 7 — Free-to-Premium Conversion Rate**
+$$\text{Conversion Rate} = \frac{\text{Users Who Upgrade to Premium}}{\text{Total Free Users}} \times 100$$
+- **Target:** ≥ 5% within 6 months of launch
+- **Measured via:** `plan_type` column in `users` table
+- **Review Frequency:** Monthly
+
+**KPI 8 — Notification Click-Through Rate**
+$$\text{Notif CTR} = \frac{\text{Notifications Clicked}}{\text{Total Notifications Sent}} \times 100$$
+- **Target:** ≥ 40% (high CTR means users find notifications useful and come back to the app)
+- **Measured via:** MongoDB notification `read` field updates
+- **Review Frequency:** Weekly
+
+#### Feedback Loop Process
+
+This is how user feedback turns into product improvements:
+
+1. **Collect** — Users leave feedback through an in-app "Feedback" button (opens a short Google Form). Beta users are also interviewed in 30-minute sessions.
+2. **Analyze** — PM reviews all feedback weekly, groups it by theme (e.g., "navigation confusion," "missing feature," "bug report"). KPIs are reviewed alongside qualitative feedback.
+3. **Prioritize** — Engineering and PM team use a simple scoring model (impact × frequency) to decide what to fix or build next.
+4. **Build** — The highest-priority item is added to the next sprint (a sprint is 2 weeks of work). Bugs get a hotfix within 48 hours.
+5. **Release** — New features and fixes are deployed to the staging environment for 24 hours, then pushed live.
+6. **Measure** — After 2 weeks, we check if the relevant KPI improved. If not, we iterate.
+
+**Feasibility & Next Steps:** The testing plan above is achievable with our current tech stack. The immediate next step is to write the first set of Jest unit tests for the most critical functions: `toggleLike`, `addComment`, and `toggleCommunity`. These three functions touch the core value of the product.
+
+---
+
+## SECTION 5 — Delivery & Q&A Defense Prep *(10 pts — Joint)*
+
+---
+
+### 5A. Presentation Plan (30 Minutes)
+
+| Segment | Role/Speaker | Duration | Content Summary |
 |---|---|---|---|
-| **Performance** | API Response Time | 95th percentile < 300ms under normal load | Load testing with k6 |
-| **Scalability** | Concurrent Users | Handle 10,000 concurrent users without degradation | Stress testing |
-| **Security** | Password Protection | All passwords are encrypted super strong | Security check |
-| **Security** | Login Sessions | Login sessions expire after 7 days | Test login expiration |
-| **Availability** | Uptime | 99.5% uptime SLA | Monitoring alerts |
-| **Works on All Devices** | Mobile Responsive | Works fine on phones, tablets, and large screens | Test on different devices |
-| **Easy to Use** | Accessibility | All buttons and text are easy to read for everyone | Check with accessibility tools |
-| **Easy to Update** | Code Quality | All code has clear comments; more than 80% tested | Test coverage reports |
-| **Privacy** | Data Protection | Users can download their data or delete their account | Test delete feature |
+| Introduction & The Problem | PM Lead | 3 min | Overview of HobbyHub, the 4 pain points, and the 3 personas |
+| MVP Scope & User Stories | PM / BA | 4 min | Jobs-to-be-Done, MoSCoW prioritization, MVP boundary |
+| UX Walkthrough & Pages | UX Lead | 5 min | Live demo/walkthrough of the running React.js app; show all 7 pages, color system |
+| System Architecture | Tech Lead | 5 min | System diagram, technology choices, API flow sequence diagrams |
+| Database Design | Data Engineer | 7 min | ERD walkthrough, table schemas, normalization examples |
+| SQL Queries & NoSQL Plan | Data Engineer | 4 min | Walk through 3 complex SQL queries; explain MongoDB + Redis usage |
+| QA Plan & KPIs | QA Lead | 2 min | Testing strategy overview; top 3 KPIs and their formulas |
+| **TOTAL** | All | **30 min** | — |
+| **Q&A** | All | **10 min** | Open floor — all team members ready to defend any section |
 
 ---
 
-## 4. User Experience & Information Architecture
+### 5B. Anticipated Tough Questions & Defenses
 
-### 4.1 Information Architecture
+**Q1: "Why did you choose PostgreSQL instead of MongoDB for everything? Isn't MongoDB more modern?"**
+> A: PostgreSQL is actually the better fit for our core data because our data is highly relational. Users, projects, communities, likes, and comments all have strict, predictable relationships — that's exactly what relational databases are designed for. PostgreSQL enforces data integrity (e.g., you can't have a like that references a deleted project) at the database level. We chose MongoDB specifically for notifications because notification payloads vary by type (a "like" notification looks different from a "challenge result" notification), which is exactly where a flexible document store shines. We use the right tool for each job.
 
-The application uses **7 main navigation pages** for flat, fast navigation (max 2 taps to any feature):
+**Q2: "Why React.js and not Next.js? Your app could benefit from server-side rendering."**
+> A: For this MVP, we prioritized development speed and simplicity. React.js with Vite gives us instant hot module replacement and a very fast development cycle. Server-side rendering (SSR) with Next.js would add complexity to routing and API integration. SEO is not a priority for this MVP since it's a logged-in experience — most content is behind authentication. Next.js would be a strong choice in Phase 2 when we add public project discovery pages that need to be indexed by Google.
 
-```
-┌─────────────────────────────────────────────────┐
-│                    HOBBYHUB                      │
-├─────────────────────────────────────────────────┤
-│ 🏠 HOME      │ 🌐 COMMUNITIES  │ 📂 PROJECTS    │
-│ ⚡ CHALLENGES│ 🤝 FIND PEOPLE  │ 🔔 NOTIFS      │
-│ 👤 MY PROFILE                                   │
-└─────────────────────────────────────────────────┘
-```
+**Q3: "How do you ensure user data privacy? You are collecting student information."**
+> A: We take three specific steps. First, all passwords are hashed using bcrypt with a cost factor of 12 — the actual password is never stored anywhere. Second, all communication between the browser and server uses HTTPS (encrypted). Third, NFR-06 in our requirements explicitly requires that users can delete their account and all their data. We also do not sell or share user data with third parties. [ASSUMPTION] For full legal compliance in Southeast Asia, we will consult a local legal advisor before launch to ensure compliance with any applicable data protection laws.
 
-| Page | Purpose | Key Content |
-|---|---|---|
-| **🏠 Home** | Personalized feed | Projects from joined communities, active challenges, Showcase of Week |
-| **🌐 Communities** | Discover & join groups | Browse all communities, search, join/leave, member counts |
-| **📂 Projects** | Browse all content | Filter by type, sort by likes/date, create new project |
-| **⚡ Challenges** | Weekly contests | View active challenges, leaderboard, submit entry |
-| **🤝 Find People** | Discover collaborators | Search by name/skill, view profiles, connect/follow |
-| **🔔 Notifications** | Stay updated | Likes, comments, follows, challenge results |
-| **👤 My Profile** | Personal hub | Edit profile, view own projects, follower stats |
+**Q4: "What happens if your app gets 100,000 users? Will it crash?"**
+> A: Our architecture is designed to scale. The three main techniques we use are: (1) Redis caching for the home feed — this reduces database load by up to 70% because most users see the same recent projects; (2) database indexing on all frequently-queried columns — this keeps queries fast even with millions of rows; and (3) the architecture is stateless (the API server doesn't hold user data in memory), which means we can add more servers behind a load balancer if traffic spikes. See Section 8 in the Database Design Document for the full scaling plan.
 
-### 4.2 User Journey Map
+**Q5: "Who is your main competitor, and how do you plan to beat them?"**
+> A: Our closest competitor is Behance (owned by Adobe). Behance is a portfolio showcase platform, but it has no real-time community feed, no weekly challenges, no collaborator discovery, and no notification system. It is a gallery, not a community. HobbyHub wins by being the community-first platform — the challenges, follow system, and community groups create daily habits that a static portfolio platform never can. We also target a younger, campus-based audience that finds Behance too formal.
 
-**Persona: Alex Chen, 3rd-year CS student, wants to find co-founders for a startup idea.**
+**Q6: "Your premium plan is only $5/month. How does that sustain a real business?"**
+> A: $5/month is the entry price, designed to minimize the barrier to upgrading. If we get 10,000 active users and convert 5% (our KPI target), that's 500 paying users at $5 = $2,500/month. That covers basic AWS infrastructure costs for the MVP. By Phase 3 (12 months post-launch), we plan to add a second revenue stream: featured community sponsorships, where companies can sponsor a weekly challenge to reach student creators. This is similar to how Dribbble and Behance handle brand partnerships.
 
-```
-STAGE 1: DISCOVER          STAGE 2: SIGN UP         STAGE 3: EXPLORE
-┌─────────────────┐       ┌─────────────────┐      ┌──────────────────┐
-│ Sees HobbyHub   │──────▶│ Creates account │──────▶│ Browses "Code &  │
-│ link in Discord │       │ Sets hobbies    │      │ Create" community│
-│                 │       │                 │      │                  │
-│ Emotion: 😐    │       │ Emotion: 😐     │      │ Emotion: 😐      │
-│ Curious        │       │ Hopeful         │      │ Interested       │
-└─────────────────┘       └─────────────────┘      └──────────────────┘
-                                                            │
-                                                            │
-STAGE 4: POST IDEA        STAGE 5: CONNECT & SUCCEED
-┌────────────────────┐    ┌──────────────────────────┐
-│ Posts StudyBuddy   │───▶│ Receives comments within │
-│ app idea + tags    │    │ 24hrs, connects with Mia│
-│                    │    │ (designer)               │
-│ Emotion: 😊 Excited│    │                          │
-│ Action taken      │    │ Emotion: 😍 Grateful    │
-└────────────────────┘    │ Problem solved!          │
-                          └──────────────────────────┘
-```
+**Q7: "Can you explain your normalization? Why did you denormalize the tags field?"**
+> A: Great question. Tags are stored as a PostgreSQL array (`TEXT[]`) directly on the `projects` table instead of a separate `project_tags` junction table. This is intentional denormalization. In a fully normalized design, querying a project's tags would require a JOIN to a separate table on every single project card load — and we load 20+ cards at once on the home feed. By storing tags as an array, one query gives us everything. The trade-off is that updating a specific tag across many projects is slightly harder, but tags are almost never updated after creation. We'd be making reads (which happen hundreds of times per day per user) slower to make writes (which almost never happen) cleaner. That's a bad trade-off for this use case.
+
+**Q8 (Wildcard): "This is a demo app. How would you handle image uploads in the real backend?"**
+> A: Currently, the MVP frontend uses color-coded placeholder cards instead of real images, because building a full image upload pipeline is out of scope for the MVP. In the real backend, here's the exact flow: the user selects a file in the browser → the React app sends a `POST /upload` request with the image file as `multipart/form-data` → the Node.js server receives it and streams it directly to AWS S3 (a cloud file storage service) → S3 returns a permanent URL for the file → the Node.js server saves that URL to the `image_url` column in the `projects` table → the React app reads and displays that URL. We have already defined the `image_url` column in our schema precisely for this reason.
 
 ---
 
-## 5. System Architecture
+## Section 6 — Flowchart: Core User Scenario *(FESE305 — Architecture)*
 
-### 5.1 High-Level Architecture Diagram
+**Scenario: User posts a project and submits it to a challenge.**
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      USER BROWSER                           │
-│                   (React 18 Web App)                        │
-└────────────────────────┬────────────────────────────────────┘
-                         │ HTTPS Requests
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    API GATEWAY                              │
-│  (Node.js + Express, JWT Auth, Input Validation)           │
-├─────────────────────────────────────────────────────────────┤
-│ Routes: /auth, /users, /projects, /communities, /etc        │
-└────────────┬─────────────────────────────────────────────────┘
-             │
-    ┌────────┴────────┐
-    ▼                 ▼
-┌──────────────┐   ┌────────────────────┐
-│ PostgreSQL   │   │ MongoDB (No-SQL)   │
-│ (Relational) │   │ - Notifications    │
-│ - Users      │   │ - Media metadata   │
-│ - Projects   │   │ - Activity logs    │
-│ - Communities│   └────────────────────┘
-└──────────────┘
-    ▲
-    │ Cache Layer
-    ▼
-┌─────────────────┐
-│   Redis Cache   │
-│ - Feed cache    │
-│ - Session tokens│
-│ - Leaderboards  │
-└─────────────────┘
-```
+```mermaid
+flowchart TD
+    A([User opens HobbyHub]) --> B{Is user logged in?}
+    B -->|No| C[Show Login Page]
+    C --> D[User enters email + password]
+    D --> E{Credentials valid?}
+    E -->|No| F[Show error: 'Invalid credentials']
+    F --> D
+    E -->|Yes| G[Issue JWT Token\nRedirect to Home Feed]
+    B -->|Yes| G
 
-### 5.2 Key Technology Stack
+    G --> H[User clicks 'New Project']
+    H --> I[Project Form Modal Opens]
+    I --> J[User fills in title, description, tags, and community]
+    J --> K{Form valid?\nTitle and description present?}
+    K -->|No| L[Show inline error message\nHighlight empty fields]
+    L --> J
+    K -->|Yes| M[POST /projects to API Server]
+    M --> N{API verifies JWT token}
+    N -->|Invalid| O[Return 401 Unauthorized\nRedirect to Login]
+    N -->|Valid| P[INSERT project into PostgreSQL\nGet project_id back]
+    P --> Q[Invalidate feed cache in Redis]
+    Q --> R[Return 201 Created + project data]
+    R --> S[React app adds project to top of feed]
+    S --> T[Show success toast: 'Project posted!']
 
-| Layer | Technology | Purpose |
-|---|---|---|
-| **Frontend** | React 18, Vite, TailwindCSS | Fast, responsive web app |
-| **API** | Node.js, Express.js | Server that handles all requests and responses |
-| **Login** | Secure Tokens | Safe login system without storing sessions on server|
-| **Database** | PostgreSQL | Main database storing all important data (tables) |
-| **Extra Storage** | MongoDB | Database for notifications and activity records |
-| **Cache** | Redis | Session & feed caching |
-| **Cloud** | AWS (EC2, RDS, ElastiCache) | Hosting & infrastructure |
-
----
-
-## 6. API Flow & Sequence Diagrams
-
-### 6.1 Posting a Project (Sequence Diagram)
-
-```
-User Browser          React App            API Gateway         PostgreSQL
-    │                   │                      │                   │
-    │─(1) Fill form──▶│                        │                   │
-    │  and Click      │                        │                   │
-    │  Submit         │                        │                   │
-    │                 │─(2) POST /api/────────▶│                   │
-    │                 │  projects + JWT        │                   │
-    │                 │  + form data           │                   │
-    │                 │                        │─(3) Validate JWT──│
-    │                 │                        │                   │
-    │                 │                        │─(4) INSERT INTO───▶│
-    │                 │                        │  projects table    │
-    │                 │                        │                   │
-    │                 │                        │◀─(5) Return ID─────│
-    │                 │                        │  + Project data    │
-    │                 │◀(6) Return 201 Created─│                   │
-    │                 │  + project JSON        │                   │
-    │◀(7) Update────│                        │                   │
-│  feed with          │                        │                   │
-│  new project       │                        │                   │
-│                   │                        │                   │
-```
-
-### 6.2 Liking a Project
-
-```
-User Clicks              API Gateway         PostgreSQL          Redux Store
-"Like" Button                │                   │                   │
-        │                     │                   │                   │
-        │─ POST /likes ──────▶│                   │                   │
-        │   projectId=5       │                   │                   │
-        │   userId=1          │─ INSERT INTO─────▶│                   │
-        │                     │   likes table     │                   │
-        │                     │   (user,project)  │                   │
-        │                     │                   │                   │
-        │                     │◀─ UNIQUE          │                   │
-        │                     │  Constraint OK    │                   │
-        │                     │                   │                   │
-        │◀─ 201 Created ──────│                   │                   │
-        │   {likes: 88}       │                   │                   │
-        │                     │                   │  ◀─ Update────────│
-        │ (Heart Icon         │                   │    Like Count     │
-        │  turns red)         │                   │                   │
-```
-
-    ### 6.3 API Endpoints (MVP)
-
-    This is the full endpoint list your project should have for MVP.
-
-    Base URL example: `https://api.hobbyhub.com/api/v1`
-
-    Auth rule:
-    - Public endpoints: no token needed
-    - Protected endpoints: `Authorization: Bearer <jwt_token>` required
-
-    #### 6.3.1 Auth Endpoints
-
-    | Method | Endpoint | Public/Protected | What it does |
-    |---|---|---|---|
-    | `POST` | `/auth/signup` | Public | Create a new user account |
-    | `POST` | `/auth/login` | Public | Login and return JWT token |
-    | `POST` | `/auth/logout` | Protected | Logout current user |
-    | `POST` | `/auth/refresh` | Protected | Refresh access token |
-    | `GET` | `/auth/me` | Protected | Return current logged-in user info |
-
-    #### 6.3.2 User Profile Endpoints
-
-    | Method | Endpoint | Public/Protected | What it does |
-    |---|---|---|---|
-    | `GET` | `/users/:userId` | Public | Get public profile details |
-    | `PATCH` | `/users/:userId` | Protected | Update own profile (bio, avatar, skills) |
-    | `GET` | `/users/:userId/projects` | Public | Get projects created by this user |
-    | `GET` | `/users/:userId/followers` | Public | List followers |
-    | `GET` | `/users/:userId/following` | Public | List following |
-
-    #### 6.3.3 Project Endpoints
-
-    | Method | Endpoint | Public/Protected | What it does |
-    |---|---|---|---|
-    | `POST` | `/projects` | Protected | Create a new project post |
-    | `GET` | `/projects` | Public | List projects with filters (`tag`, `community`, `type`, `status`) |
-    | `GET` | `/projects/:projectId` | Public | Get single project details |
-    | `PATCH` | `/projects/:projectId` | Protected | Edit own project |
-    | `DELETE` | `/projects/:projectId` | Protected | Delete own project |
-    | `POST` | `/projects/:projectId/publish` | Protected | Move project from draft to published |
-    | `POST` | `/projects/:projectId/archive` | Protected | Archive a project |
-
-    #### 6.3.4 Like Endpoints
-
-    | Method | Endpoint | Public/Protected | What it does |
-    |---|---|---|---|
-    | `POST` | `/projects/:projectId/likes` | Protected | Like a project |
-    | `DELETE` | `/projects/:projectId/likes` | Protected | Remove like from a project |
-    | `GET` | `/projects/:projectId/likes/count` | Public | Get total like count |
-
-    #### 6.3.5 Comment Endpoints
-
-    | Method | Endpoint | Public/Protected | What it does |
-    |---|---|---|---|
-    | `POST` | `/projects/:projectId/comments` | Protected | Add a comment |
-    | `GET` | `/projects/:projectId/comments` | Public | Get comments (with replies) |
-    | `PATCH` | `/comments/:commentId` | Protected | Edit own comment |
-    | `DELETE` | `/comments/:commentId` | Protected | Delete own comment |
-    | `POST` | `/comments/:commentId/replies` | Protected | Reply to a comment |
-
-    #### 6.3.6 Community Endpoints
-
-    | Method | Endpoint | Public/Protected | What it does |
-    |---|---|---|---|
-    | `GET` | `/communities` | Public | List all communities |
-    | `GET` | `/communities/:communityId` | Public | Get community details |
-    | `POST` | `/communities/:communityId/join` | Protected | Join a community |
-    | `DELETE` | `/communities/:communityId/join` | Protected | Leave a community |
-    | `GET` | `/communities/:communityId/projects` | Public | Get projects in a community |
-
-    #### 6.3.7 Follow Endpoints
-
-    | Method | Endpoint | Public/Protected | What it does |
-    |---|---|---|---|
-    | `POST` | `/users/:userId/follow` | Protected | Follow a user |
-    | `DELETE` | `/users/:userId/follow` | Protected | Unfollow a user |
-
-    #### 6.3.8 Challenge Endpoints
-
-    | Method | Endpoint | Public/Protected | What it does |
-    |---|---|---|---|
-    | `GET` | `/challenges/active` | Public | List active challenges |
-    | `GET` | `/challenges/:challengeId` | Public | Get challenge details |
-    | `POST` | `/challenges/:challengeId/entries` | Protected | Submit project to challenge |
-    | `GET` | `/challenges/:challengeId/leaderboard` | Public | Get leaderboard by likes |
-
-    #### 6.3.9 Feed and Search Endpoints
-
-    | Method | Endpoint | Public/Protected | What it does |
-    |---|---|---|---|
-    | `GET` | `/feed/:userId` | Protected | Get personalized home feed |
-    | `GET` | `/search/projects` | Public | Search projects by keyword and tags |
-    | `GET` | `/search/users` | Public | Search users by name and skills |
-    | `GET` | `/search/communities` | Public | Search communities by name |
-
-    #### 6.3.10 Notification Endpoints
-
-    | Method | Endpoint | Public/Protected | What it does |
-    |---|---|---|---|
-    | `GET` | `/notifications` | Protected | Get current user's notifications |
-    | `PATCH` | `/notifications/:notificationId/read` | Protected | Mark one notification as read |
-    | `PATCH` | `/notifications/read-all` | Protected | Mark all notifications as read |
-
-    #### 6.3.11 Admin Endpoints (Optional for MVP, recommended)
-
-    | Method | Endpoint | Public/Protected | What it does |
-    |---|---|---|---|
-    | `POST` | `/admin/challenges` | Protected (Admin) | Create a challenge |
-    | `PATCH` | `/admin/projects/:projectId/feature` | Protected (Admin) | Mark project as featured |
-    | `GET` | `/admin/metrics` | Protected (Admin) | View platform stats |
-
-    #### 6.3.12 Response Code Standard
-
-    Use these status codes consistently:
-
-    | Status Code | Meaning | When to use |
-    |---|---|---|
-    | `200` | OK | Successful `GET`, `PATCH`, `DELETE` |
-    | `201` | Created | Successful `POST` (new resource created) |
-    | `400` | Bad Request | Missing or invalid input |
-    | `401` | Unauthorized | Missing/invalid JWT token |
-    | `403` | Forbidden | Logged in but no permission |
-    | `404` | Not Found | Resource does not exist |
-    | `409` | Conflict | Duplicate action (like already liked/joined) |
-    | `422` | Unprocessable Entity | Validation failed |
-    | `500` | Internal Server Error | Unexpected backend error |
-
-    #### 6.3.13 MVP Endpoint Count
-
-    - Core MVP endpoints: **42**
-    - Optional admin endpoints: **3**
-    - Total documented endpoints: **45**
-
-    This endpoint list matches your PRD features: auth, projects, communities, likes, comments, follow system, challenges, feed, search, and notifications.
-
----
-
-## 7. Entity State Transitions
-
-### 7.1 Project Entity Lifecycle
-
-```
-                    ┌─────────────────────┐
-                    │   Project Created   │
-                    │  (Draft state)      │
-                    └──────────┬──────────┘
-                              │
-                  User clicks "Publish"
-                              │
-                              ▼
-                    ┌─────────────────────┐
-                    │    PUBLISHED        │ ◀─── Visible on feed
-                    │ (Main state)        │      (Can receive likes,
-                    └──────────┬──────────┘       comments, challenge
-                              │                   entries)
-                    ┌─────────┴──────────┐
-                    │                    │
-         Admin marks featured    User submits to
-              or challenge entry        challenge
-                    │                    │
-                    ▼                    ▼
-          ┌──────────────────┐ ┌──────────────────┐
-          │    FEATURED      │ │  CHALLENGE_ENTRY │
-          │ (Showcase Week)  │ │ (In competition) │
-          └──────────────────┘ └──────────────────┘
-                    │                    │
-         Both can return to              │
-         PUBLISHED or move to            │
-              ARCHIVED                   │
-                    │◀───────────────────┘
-                    │
-          User/Admin archives
-                    │
-                    ▼
-          ┌─────────────────────┐
-          │    ARCHIVED         │ ◀─── Hidden from feed
-          │ (Can restore)       │       (Read-only)
-          └─────────────────────┘
+    T --> U{User wants to enter a challenge?}
+    U -->|No| V([End - project is live])
+    U -->|Yes| W[User navigates to Challenges Page]
+    W --> X[User clicks 'Enter Challenge']
+    X --> Y[Modal shows user's projects]
+    Y --> Z[User selects their new project]
+    Z --> AA{Already submitted to this challenge?}
+    AA -->|Yes| AB[Show error: 'Already submitted'\nReturn 409 Conflict]
+    AA -->|No| AC[INSERT into challenge_entries table]
+    AC --> AD[Invalidate challenge leaderboard cache in Redis]
+    AD --> AE[Return 201 Created]
+    AE --> AF([Show success toast: 'Challenge entered! Good luck!'])
 ```
 
 ---
 
-## 8. Presentation & Wireframes
+## Section 7 — Conceptual Architecture Diagram
 
-### 8.1 Home Feed Page Layout
+```mermaid
+graph LR
+    subgraph "User Layer"
+        Browser["🖥️ React.js Web App\n(Runs in User's Browser)"]
+    end
 
-```
-┌─────────────────────────────────────────────────────────┐
-│       HOBBYHUB  🎯                         [User Menu]  │
-├─────────────────────────────────────────────────────────┤
-│ 🏠 HOME  │ 🌐 COMMUNITIES  │ 📂 PROJECTS ...            │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  Welcome back, Alex! 👋                                │
-│                                                         │
-│  ⚡ ACTIVE CHALLENGE: Build a Mini App in 48hrs       │
-│  ┌─────────────────────────────────────────────────┐  │
-│  │ 67 participants · 3 days left                  │  │
-│  │                 [JOIN NOW] or [JOINED ✅]      │  │
-│  └─────────────────────────────────────────────────┘  │
-│                                                         │
-│  📂 RECENT PROJECTS                                   │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │
-│  │ StudyBuddy   │  │ Campus Life  │  │ LoFi Beat    │ │
-│  │ App          │  │ Illustrations│  │ Pack Vol.2   │ │
-│  │ by Alex Chen │  │ by Mia Torres│  │ by Leo Park  │ │
-│  │ 📱           │  │ 🖼️           │  │ 🎧           │ │
-│  │ React, AI, … │  │ Digital Art… │  │ Music, LoFi… │ │
-│  │              │  │              │  │              │ │
-│  │ ❤️ 87  💬 14 │  │ ❤️ 142 💬 23 │  │ ❤️ 203 💬 41 │ │
-│  └──────────────┘  └──────────────┘  └──────────────┘ │
-│                                                         │
-│  [Load More Projects...]                              │
-└─────────────────────────────────────────────────────────┘
-```
+    subgraph "API Layer - Node.js + Express"
+        Gateway["API Gateway\n(Routes + Validation)"]
+        Auth["Auth Module\n(JWT Verify)"]
+        Projects["Projects Module"]
+        Communities["Communities Module"]
+        Notifs["Notifications Module"]
+        Feed["Feed Builder Module"]
+    end
 
-### 8.2 Project Detail Page with Comments
+    subgraph "Data Layer"
+        PG[("PostgreSQL\n(Users, Projects,\nCommunities, Likes,\nComments, Follows)")]
+        Mongo[("MongoDB\n(Notifications,\nActivity Logs)")]
+        Redis[("Redis Cache\n(Feed, Sessions,\nLeaderboards)")]
+    end
 
-```
-┌───────────────────────────────────────────┐
-│ StudyBuddy App                            │
-│ by Alex Chen · Code & Create community    │
-│                                           │
-│ 📱 [PROJECT IMAGE HERE]                  │
-│                                           │
-│ AI-powered study planner that syncs      │
-│ with your class schedule. Looking for    │
-│ a designer to join!                      │
-│                                           │
-│ Tags: React, AI, Education               │
-│                                           │
-│ ❤️ 87  💬 Comment  🤝 Looking for: UI-UX │
-│                                           │
-├───────────────────────────────────────────┤
-│ 💬 COMMENTS (14)                          │
-├───────────────────────────────────────────┤
-│                                           │
-│ 🧑 Mia Torres · 2 hours ago              │
-│ "This looks amazing! I'd love to         │
-│  help with the UI/UX design 🎨"          │
-│                                           │
-│ 🧑 Sara Nguyen · 5 hours ago             │
-│ "How are you handling data sync?"        │
-│                                           │
-│ [TEXT INPUT: Add a comment...]           │
-│ [Post Button]                            │
-│                                           │
-└───────────────────────────────────────────┘
+    subgraph "Cloud Infrastructure - AWS"
+        S3["S3\n(Image Storage)"]
+        RDS["RDS\n(Managed PostgreSQL)"]
+        EC2["EC2\n(API Server Host)"]
+    end
+
+    Browser -->|"HTTPS"| Gateway
+    Gateway --> Auth
+    Auth -->|"Verified Request"| Projects
+    Auth -->|"Verified Request"| Communities
+    Auth -->|"Verified Request"| Notifs
+    Auth -->|"Verified Request"| Feed
+    Projects --> PG
+    Communities --> PG
+    Notifs --> Mongo
+    Feed --> Redis
+    Redis -->|"Cache Miss"| PG
+    PG --> RDS
+    Projects --> S3
+    EC2 --> Gateway
 ```
 
-### 8.3 Find People Page
+**Module Explanations:**
 
-```
-┌─────────────────────────────────────────┐
-│ Find People 🤝                          │
-├─────────────────────────────────────────┤
-│ [Search by name or skill...]            │
-│                                         │
-│ ┌─────────────────────────────────────┐ │
-│ │ 👤 Mia Torres                       │ │
-│ │ NYC · Fine Arts · 2nd Year          │ │
-│ │ ★ Free Creator                      │ │
-│ │ Digital artist & visual story...    │ │
-│ │ Skills: Illustration, Procreate...  │ │
-│ │                                     │ │
-│ │ 👥 289 followers  🔗 143 following  │ │
-│ │                                     │ │
-│ │ [👋 Connect] [⭐ Follow]            │ │
-│ └─────────────────────────────────────┘ │
-│                                         │
-│ ┌─────────────────────────────────────┐ │
-│ │ 👤 Leo Park                         │ │
-│ │ Seoul · Music Tech · 4th Year       │ │
-│ │ ★★ Creator (Premium)                │ │
-│ │ Making beats and building audio...  │ │
-│ │ Skills: Ableton, Sound Design...    │ │
-│ │                                     │ │
-│ │ 👥 512 followers  🔗 78 following   │ │
-│ │                                     │ │
-│ │ [✅ Connected] [⭐ Following]        │ │
-│ └─────────────────────────────────────┘ │
-│                                         │
-└─────────────────────────────────────────┘
-```
+- **React.js Web App (Browser):** This is what the user sees and interacts with. It runs entirely in the user's browser. It sends requests to our server using HTTPS (secure internet protocol) and re-renders the appropriate screen when it gets data back.
+
+- **API Gateway (Node.js + Express):** This is the "front door" of our server. Every request from the browser comes here first. The gateway validates the request format and makes sure a JWT token is present before passing the request to the right module.
+
+- **Auth Module:** Responsible for one thing only — verifying that the user is who they say they are. It reads the JWT token from the request header and decodes it. If it's valid, the request is allowed through.
+
+- **Projects Module:** Handles all project-related operations — creating, reading, updating, and deleting projects. This is the most frequently used module and is the core of the application.
+
+- **Communities Module:** Manages the list of communities, memberships (who has joined which group), and community-specific project feeds. When a user joins or leaves a community, this module updates the `memberships` table.
+
+- **Notifications Module:** Writes new notification documents to MongoDB whenever a "like," "comment," or "follow" event occurs. It also reads notification lists for the Notifications page.
+
+- **Feed Builder Module:** The most complex query in the system. It reads from Redis first (for speed); if no cache exists (a "cache miss"), it runs the complex JOIN query on PostgreSQL to build the personalized feed, then stores the result in Redis for the next 2 minutes.
+
+- **PostgreSQL on AWS RDS:** The main source of truth for all important, structured data. AWS RDS is a managed service, meaning AWS handles backups, updates, and failover automatically.
+
+- **MongoDB:** Used specifically for notifications because each notification type has a slightly different structure. MongoDB's flexible document model is perfect for this.
+
+- **Redis Cache:** An in-memory key-value store (think of it like a very fast sticky note board). We use it to store the home feed and challenge leaderboard temporarily so we don't have to re-run expensive database queries every time.
+
+- **AWS S3:** A file storage service. In the production version, project images are uploaded here and served via a CDN (Content Delivery Network — a network of fast servers worldwide that serves files quickly).
 
 ---
 
-## 9. Success Metrics & KPIs
+## Deliverable Links
 
-After launch, we track these metrics weekly to measure product-market fit:
-
-| KPI | Target (3 months) | Why It Matters |
-|---|---|---|
-| **DAU / MAU Ratio** | > 30% | Stickiness (industry avg: 20%) |
-| **Projects Posted / Week** | > 500 | Content creation velocity |
-| **Connection Request Rate** | > 15% of active users | Platform enabling real collaborations |
-| **Free → Premium Conversion** | > 5% at 6 months | Revenue & sustainability |
-| **Avg Session Duration** | > 8 minutes | User engagement quality |
-| **Challenge Participation** | > 20% of active users | Engagement loop success |
-| **Feed Query Latency (p95)** | < 300ms | Technical performance health |
+| Resource | Link |
+|---|---|
+| 📊 Slide Deck | [PLACEHOLDER — https://docs.google.com/presentation/your-deck] |
+| 🎨 Figma Prototype | [PLACEHOLDER — https://figma.com/your-hobbyhub-prototype] |
+| 💾 GitHub Repository | [PLACEHOLDER — https://github.com/your-org/hobbyhub] |
 
 ---
 
-## 10. UML Diagrams
+## Final Checklist
 
-### 10.1 Use Case Diagram
-
-Shows what users can do in the system:
-
-```
-                    HobbyHub System
-    ┌─────────────────────────────────────────────┐
-    │                                             │
-    │   ○ Browse Projects                         │
-    │   ○ Search Projects/Users                   │
-    │   ○ View Project Details                    │
-    │                                             │
-    │   AUTHENTICATION                            │
-    │   ○ Sign Up                                 │
-    │   ○ Log In                                  │
-    │   ○ Log Out                                 │
-    │                                             │
-    │   PROJECT MANAGEMENT                        │
-    │   ○ Create Project                          │
-    │   ○ Edit Project                            │
-    │   ○ Delete Project                          │
-    │   ○ Upload Image                            │
-    │                                             │
-    │   SOCIAL FEATURES                           │
-    │   ○ Like Project                            │
-    │   ○ Comment on Project                      │
-    │   ○ Reply to Comment                        │
-    │   ○ Follow User                             │
-    │   ○ Unfollow User                           │
-    │                                             │
-    │   COMMUNITY FEATURES                        │
-    │   ○ Browse Communities                      │
-    │   ○ Join Community                          │
-    │   ○ Leave Community                         │
-    │   ○ View Community Feed                     │
-    │                                             │
-    │   CHALLENGES                                │
-    │   ○ View Active Challenges                  │
-    │   ○ Submit Project to Challenge             │
-    │   ○ View Leaderboard                        │
-    │                                             │
-    │   PROFILE                                   │
-    │   ○ Edit Profile                            │
-    │   ○ View Own Projects                       │
-    │   ○ View Followers/Following                │
-    │   ○ Upgrade to Premium      ─────┐         │
-    │                                   │         │
-    └───────────────────────────────────┼─────────┘
-                                        │
-    👤 User (Student/Hobbyist)          │
-        │                               │
-        │ includes                      │
-        ├── Guest User                  │
-        │   (limited access)            │
-        │                               │
-        └── Premium User                │
-            (all features + extras) <───┘
-
-
-    👤 Admin User
-        │
-        ├── Create Challenges
-        ├── Feature Projects
-        ├── Manage Communities
-        └── View Analytics
-```
+- [x] Every user story is linked to a functional requirement (see US-xx → FR-xx in Section 1C)
+- [x] Every functional requirement is linked to a test case (see "How to Test It" column)
+- [x] Every DB table appears in the ERD and in at least one SQL query (see DB Design Document)
+- [x] Every KPI has a formula, target, and measurement method (see Section 4B)
+- [x] All technical terms are defined in plain English on first use
+- [x] All assumptions are flagged with [ASSUMPTION]
+- [x] All diagrams use Mermaid syntax
+- [x] Every major section ends with a Feasibility & Next Steps paragraph
+- [x] Language throughout is simple, detailed, and accessible to non-technical readers
 
 ---
-
-### 10.2 Activity Diagram - Posting a Project
-
-Shows the step-by-step flow when a user posts a project:
-
-```
-    START
-      │
-      ▼
-   ┌──────────────┐
-   │ User clicks  │
-   │ "New Project"│
-   └──────┬───────┘
-          │
-          ▼
-   ┌─────────────────┐
-   │ Check: Logged   │
-   │ in?             │
-   └─────┬───────────┘
-         │
-    ┌────┴────┐
-    │         │
-   NO        YES
-    │         │
-    ▼         ▼
-┌───────┐  ┌─────────────────┐
-│Redirect│  │ Show Create     │
-│to Login│  │ Project Form    │
-└───────┘  └────────┬─────────┘
-    │               │
-    │               ▼
-    │        ┌──────────────┐
-    │        │ User fills:  │
-    │        │ - Title      │
-    │        │ - Description│
-    │        │ - Tags       │
-    │        │ - Image      │
-    │        │ - Community  │
-    │        └──────┬───────┘
-    │               │
-    │               ▼
-    │        ┌──────────────────┐
-    │        │ Click "Submit"   │
-    │        └──────┬───────────┘
-    │               │
-    │               ▼
-    │        ┌──────────────────┐
-    │        │ Validate Form    │
-    │        │ - Title filled?  │
-    │        │ - Description?   │
-    │        └──────┬───────────┘
-    │               │
-    │          ┌────┴────┐
-    │          │         │
-    │        FAIL       PASS
-    │          │         │
-    │          ▼         ▼
-    │    ┌─────────┐  ┌────────────────┐
-    │    │ Show    │  │ Upload image   │
-    │    │ Error   │  │ to server      │
-    │    └────┬────┘  └────────┬───────┘
-    │         │                │
-    │         └────────┐       ▼
-    │                  │  ┌────────────────┐
-    │                  │  │ Save project   │
-    │                  │  │ to database    │
-    │                  │  └────────┬───────┘
-    │                  │           │
-    │                  │           ▼
-    │                  │  ┌────────────────┐
-    │                  │  │ Update cache   │
-    │                  │  │ (feed refresh) │
-    │                  │  └────────┬───────┘
-    │                  │           │
-    │                  │           ▼
-    │                  │  ┌────────────────┐
-    │                  │  │ Show success   │
-    │                  │  │ "Project posted│
-    │                  │  │    ✅"         │
-    │                  │  └────────┬───────┘
-    │                  │           │
-    └──────────────────┴───────────┘
-                       │
-                       ▼
-                     END
-```
-
----
-
-### 10.3 Activity Diagram - Like/Unlike Flow
-
-```
-    START: User clicks ❤️
-      │
-      ▼
-   ┌──────────────┐
-   │ Check: User  │
-   │ logged in?   │
-   └──────┬───────┘
-          │
-     ┌────┴────┐
-     │         │
-    NO        YES
-     │         │
-     ▼         ▼
-┌────────┐  ┌─────────────────┐
-│Redirect│  │ Query database: │
-│to Login│  │ Already liked?  │
-└────────┘  └────────┬─────────┘
-              ┌──────┴────────┐
-              │               │
-            YES              NO
-              │               │
-              ▼               ▼
-    ┌──────────────┐   ┌──────────────┐
-    │ UNLIKE ACTION│   │ LIKE ACTION  │
-    │              │   │              │
-    │ DELETE FROM  │   │ INSERT INTO  │
-    │ likes table  │   │ likes table  │
-    └──────┬───────┘   └──────┬───────┘
-           │                  │
-           └────────┬─────────┘
-                    │
-                    ▼
-           ┌─────────────────┐
-           │ Update cache    │
-           │ (like count)    │
-           └────────┬────────┘
-                    │
-                    ▼
-           ┌─────────────────┐
-           │ Send response   │
-           │ to frontend     │
-           └────────┬────────┘
-                    │
-                    ▼
-           ┌─────────────────┐
-           │ Update UI:      │
-           │ - Heart icon    │
-           │ - Like count    │
-           └────────┬────────┘
-                    │
-                    ▼
-                   END
-```
-
----
-
-### 10.4 Sequence Diagram - User Registration Flow
-
-```
-User            Browser         API Server      Database        Email Service
- │                 │                 │              │                 │
- │ Fill form       │                 │              │                 │
- │────────────────>│                 │              │                 │
- │                 │                 │              │                 │
- │ Click Submit    │                 │              │                 │
- │────────────────>│                 │              │                 │
- │                 │                 │              │                 │
- │                 │ POST /signup    │              │                 │
- │                 │ {email,pass}    │              │                 │
- │                 │────────────────>│              │                 │
- │                 │                 │              │                 │
- │                 │                 │ Check email  │                 │
- │                 │                 │ unique?      │                 │
- │                 │                 │─────────────>│                 │
- │                 │                 │              │                 │
- │                 │                 │<─────────────│                 │
- │                 │                 │ OK / UNIQUE  │                 │
- │                 │                 │              │                 │
- │                 │                 │ Hash password│                 │
- │                 │                 │ (bcrypt)     │                 │
- │                 │                 │              │                 │
- │                 │                 │ INSERT user  │                 │
- │                 │                 │─────────────>│                 │
- │                 │                 │              │                 │
- │                 │                 │<─────────────│                 │
- │                 │                 │ user_id: 123 │                 │
- │                 │                 │              │                 │
- │                 │                 │ Create JWT   │                 │
- │                 │                 │ token        │                 │
- │                 │                 │              │                 │
- │                 │                 │ Send welcome email              │
- │                 │                 │──────────────────────────────>│
- │                 │                 │              │                 │
- │                 │<────────────────│              │                 │
- │                 │ 201 Created     │              │                 │
- │                 │ {token, user}   │              │                 │
- │                 │                 │              │                 │
- │<────────────────│                 │              │                 │
- │ Show dashboard  │                 │              │                 │
- │ (logged in ✅)  │                 │              │                 │
-```
-
----
-
-### 10.5 Sequence Diagram - Challenge Submission
-
-```
-User         Browser      API Server    Projects DB   Challenges DB   Cache
- │              │              │              │              │          │
- │ Browse       │              │              │              │          │
- │ active       │              │              │              │          │
- │ challenges   │              │              │              │          │
- │─────────────>│              │              │              │          │
- │              │              │              │              │          │
- │              │ GET /challenges/active      │              │          │
- │              │─────────────>│              │              │          │
- │              │              │              │              │          │
- │              │              │ SELECT * WHERE ends_at > NOW()         │
- │              │              │──────────────────────────>│            │
- │              │              │              │              │          │
- │              │              │<────────────────────────────│          │
- │              │              │ [Challenge list]            │          │
- │              │              │              │              │          │
- │              │<─────────────│              │              │          │
- │              │ 200 OK       │              │              │          │
- │<─────────────│ [Challenges] │              │              │          │
- │              │              │              │              │          │
- │ Select       │              │              │              │          │
- │ project      │              │              │              │          │
- │ & submit     │              │              │              │          │
- │─────────────>│              │              │              │          │
- │              │              │              │              │          │
- │              │ POST /challenges/801/submit │              │          │
- │              │ {project_id: 101}           │              │          │
- │              │─────────────>│              │              │          │
- │              │              │              │              │          │
- │              │              │ Check: project exists?      │          │
- │              │              │─────────────>│              │          │
- │              │              │<─────────────│              │          │
- │              │              │ YES          │              │          │
- │              │              │              │              │          │
- │              │              │ Check: already submitted?   │          │
- │              │              │──────────────────────────>│            │
- │              │              │              │              │          │
- │              │              │<────────────────────────────│          │
- │              │              │ NO (good!)   │              │          │
- │              │              │              │              │          │
- │              │              │ INSERT challenge_entry      │          │
- │              │              │──────────────────────────>│            │
- │              │              │              │              │          │
- │              │              │ Invalidate leaderboard cache│          │
- │              │              │──────────────────────────────────────>│
- │              │              │              │              │          │
- │              │<─────────────│              │              │          │
- │              │ 201 Created  │              │              │          │
- │              │ "Submitted!" │              │              │          │
- │<─────────────│              │              │              │          │
- │ Show success │              │              │              │          │
- │ message ✅   │              │              │              │          │
-```
-
----
-
-### 10.6 Class Diagram (Domain Model)
-
-Shows the main objects and their relationships:
-
-```
-┌─────────────────────────────┐
-│          User               │
-├─────────────────────────────┤
-│ - user_id: int              │
-│ - username: string          │
-│ - email: string             │
-│ - password_hash: string     │
-│ - bio: text                 │
-│ - plan_type: string         │
-│ - is_verified: boolean      │
-├─────────────────────────────┤
-│ + register()                │
-│ + login()                   │
-│ + updateProfile()           │
-│ + follow(user_id)           │
-│ + unfollow(user_id)         │
-└──────────┬──────────────────┘
-           │ 1
-           │ posts
-           │ *
-           ▼
-┌─────────────────────────────┐
-│         Project             │
-├─────────────────────────────┤
-│ - project_id: int           │
-│ - title: string             │
-│ - description: text         │
-│ - tags: array               │
-│ - image_url: string         │
-│ - status: string            │
-│ - created_at: timestamp     │
-├─────────────────────────────┤
-│ + create()                  │
-│ + edit()                    │
-│ + delete()                  │
-│ + publish()                 │
-│ + addToChallenge()          │
-└──────────┬──────────────────┘
-           │ *
-           │ belongs to
-           │ 1
-           ▼
-┌─────────────────────────────┐
-│        Community            │
-├─────────────────────────────┤
-│ - community_id: int         │
-│ - name: string              │
-│ - description: text         │
-│ - icon: string              │
-│ - member_count: int         │
-├─────────────────────────────┤
-│ + create()                  │
-│ + addMember(user_id)        │
-│ + removeMember(user_id)     │
-└─────────────────────────────┘
-
-┌─────────────────────────────┐
-│          Like               │
-├─────────────────────────────┤
-│ - like_id: int              │
-│ - user_id: int              │
-│ - project_id: int           │
-│ - created_at: timestamp     │
-├─────────────────────────────┤
-│ + add()                     │
-│ + remove()                  │
-└─────────────────────────────┘
-
-┌─────────────────────────────┐
-│         Comment             │
-├─────────────────────────────┤
-│ - comment_id: int           │
-│ - body: text                │
-│ - parent_id: int (nullable) │
-│ - created_at: timestamp     │
-├─────────────────────────────┤
-│ + create()                  │
-│ + edit()                    │
-│ + delete()                  │
-│ + reply()                   │
-└─────────────────────────────┘
-
-┌─────────────────────────────┐
-│        Challenge            │
-├─────────────────────────────┤
-│ - challenge_id: int         │
-│ - title: string             │
-│ - starts_at: timestamp      │
-│ - ends_at: timestamp        │
-│ - prize: string             │
-├─────────────────────────────┤
-│ + create()                  │
-│ + submitEntry(project_id)   │
-│ + getLeaderboard()          │
-│ + close()                   │
-└─────────────────────────────┘
-```
-
----
-
-### 10.7 State Diagram - Project Lifecycle
-
-Shows different states a project can be in:
-
-```
-                 ┌──────────────┐
-          ┌──────│ DRAFT        │◄──────┐
-          │      │ (Initial)    │       │
-          │      └──────┬───────┘       │
-          │             │               │
-          │   [User clicks "Publish"]   │
-          │             │               │
-          │             ▼               │
-          │      ┌──────────────┐       │
-          │      │ PUBLISHED    │       │
-          │      │ (Live)       │       │
-          │      └──────┬───────┘       │
-          │             │               │
-          │       ┌─────┴─────┐         │
-          │       │           │         │
-          │   [Admin          │         │
-          │   features]   [Challenge]   │
-          │       │           │         │
-          ▼       ▼           ▼         │
-    ┌─────────┐ ┌─────────┐ ┌─────────┐│
-    │ ARCHIVED│ │FEATURED │ │COMPETING││
-    │ (Hidden)│ │(Showcase│ │ (Entry) ││
-    └─────────┘ └─────────┘ └─────────┘│
-          │       │           │         │
-          │       └───────┬───┘         │
-          │               │             │
-          │        [Time passes/        │
-          │         Admin action]       │
-          │               │             │
-          └───────────────┴─────────────┘
-```
-
----
-
-## 11. Product Roadmap (Future Phases)
-
-### Phase 2 (3 months post-launch)
-- Direct messaging between users
-- Portfolio builder for showcasing best projects
-- Email digest of trending projects
-
-### Phase 3 (6 months post-launch)
-- Mobile app (iOS/Android)
-- Live streams during launch events
-- Marketplace for paid commissions
-
-### Phase 4 (12+ months)
-- AI-powered project recommendations
-- Virtual meetups & collaboration rooms
-- Internship & hiring board for companies
-
----
-
-**End of PRD Document**
+*End of Product Requirements Document*
+*See `02_DATABASE_DESIGN_DOCUMENT.md` for Sections 6 and 7 (Data Modeling, DB Implementation, Optimization)*
